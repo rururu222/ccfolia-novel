@@ -374,7 +374,7 @@
         <input type="file" id="html-upload" accept=".html">
       </label>
       <label class="upload-btn" id="lbl-json">
-        <span>2. JSON 파일 업로드 <br><small style="color:#aaa; font-weight:normal;">(고화질 복원용)</small></span>
+        <span>2. JSON 파일 업로드</span>
         <div class="status-icon" id="icon-json"></div>
         <input type="file" id="json-upload" accept=".json">
       </label>
@@ -629,8 +629,8 @@
       const fontStack = isMyeongjo ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
       screen.style.setProperty('--dialogue-font-family', fontStack);
       screen.style.setProperty('--dialogue-font-size', `${dialogueFontSize}px`);
-      screen.style.setProperty('--dialogue-letter-spacing', isMyeongjo ? '-0.3em' : 'normal');
-      screen.style.setProperty('--speaker-letter-spacing', isMyeongjo ? '-0.3em' : '1px');
+      screen.style.setProperty('--dialogue-letter-spacing', isMyeongjo ? '-0.03em' : 'normal');
+      screen.style.setProperty('--speaker-letter-spacing', isMyeongjo ? '-0.03em' : '1px');
       const standingContainer = document.getElementById('standing-container');
       standingContainer.classList.toggle('has-shadow', standingShadow);
       standingContainer.style.transform = `translate(${standingX}px, ${-standingY}px) scale(${standingSize / 100})`;
@@ -1168,8 +1168,8 @@
       const standingXValue = standingX;
       const dialogueFontFamilyValue = dialogueFont === 'myeongjo' ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
       const dialogueFontSizeValue = dialogueFontSize;
-      const dialogueLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.3em' : 'normal';
-      const speakerLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.3em' : '1px';
+      const dialogueLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.03em' : 'normal';
+      const speakerLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.03em' : '1px';
       const canvasWidthValue = canvasWidth;
       const canvasHeightValue = canvasHeight;
       
