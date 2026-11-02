@@ -285,9 +285,9 @@
     .bg-base-control-group + .bg-base-control-group, .bg-range-control-group + .bg-range-control-group { padding-top:6px; border-top:1px solid var(--border); }
     .bg-control-heading { display:flex; align-items:center; justify-content:space-between; min-height:22px; color:var(--text-muted); font-size:10px; }
     .bg-base-location-inputs, .bg-range-location-inputs { display:grid; grid-template-columns:1fr; gap:4px; min-width:0; }
-    .bg-reset-icon { width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; padding:0; border:1px solid var(--border); border-radius:5px; color:var(--text-muted); background:var(--bg-main); cursor:pointer; }
+    .bg-reset-icon { width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; padding:0; border:0; border-radius:0; color:var(--text-muted); background:transparent; cursor:pointer; }
     .bg-reset-icon svg { width:13px; height:13px; }
-    .bg-reset-icon:hover { color:var(--text-main); background:#303034; }
+    .bg-reset-icon:hover { color:var(--text-main); background:transparent; }
     .scene-bg-notice { margin:0; color:#dc2626; font-size:11px; line-height:1.4; }
     .bg-mini-control { min-width:0; display:grid; grid-template-columns:12px minmax(0,1fr) 34px; align-items:center; gap:7px; padding:5px 7px; box-sizing:border-box; }
     .bg-mini-control.bg-size-control { grid-template-columns:minmax(0,1fr) 34px; }
@@ -299,7 +299,7 @@
     .range-value { display:inline-block; flex:0 0 52px; width:52px; min-width:0; box-sizing:border-box; overflow:visible; text-align:right; white-space:nowrap; color:var(--text-muted); font-size:11px; font-variant-numeric:tabular-nums; }
     .standing-adjust-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; margin-top:10px; min-width:0; }
     .standing-adjust-grid > label { min-width:0; box-sizing:border-box; }
-    .font-setting-row { display:grid; grid-template-columns:40px minmax(0,1fr) minmax(74px,.8fr); align-items:center; gap:6px; min-width:0; font-size:12px; }
+    .font-setting-row { display:grid; grid-template-columns:40px minmax(0,1fr) minmax(0,1fr); align-items:center; gap:6px; min-width:0; font-size:12px; }
     .font-setting-row select { width:100%; min-width:0; box-sizing:border-box; padding:6px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-main); font-size:12px; }
     .standing-adjust-grid .range-control-row { gap:3px; }
     .standing-adjust-grid .range-value { flex-basis:34px; width:34px; font-size:9px; }
@@ -425,7 +425,11 @@
           <div id="narration-name-list" class="name-check-list" role="group" aria-label="나레이션 캐릭터"></div>
         </label>
         <div class="standing-adjust-grid">
-          <label style="display:flex; flex-direction:column; gap:6px; font-size:12px;">스탠딩 세로 위치 <span class="range-control-row"><input id="standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="standing-y-value">0 px</small></span></label>
+          <div class="global-standing-position">
+            <div class="bg-control-heading"><span>스탠딩 위치 조절</span><button type="button" id="standing-position-reset" class="bg-reset-icon" aria-label="스탠딩 위치 초기화" title="스탠딩 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div>
+            <label style="display:flex; flex-direction:column; gap:6px; font-size:12px;">X <span class="range-control-row"><input id="standing-x" type="range" min="-300" max="300" step="5" value="0"><small class="range-value" id="standing-x-value">0 px</small></span></label>
+            <label style="display:flex; flex-direction:column; gap:6px; font-size:12px;">Y <span class="range-control-row"><input id="standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="standing-y-value">0 px</small></span></label>
+          </div>
           <label style="display:flex; flex-direction:column; gap:6px; font-size:12px;">스탠딩 간격 <span class="range-control-row"><input id="standing-gap" type="range" min="-50" max="50" step="1" value="0"><small class="range-value" id="standing-gap-value">0%</small></span></label>
         </div>
         <label style="display:flex; flex-direction:column; gap:6px; margin-top:10px; font-size:12px;">스탠딩 크기 <span class="range-control-row"><input id="standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="standing-size-value">100%</small></span></label>
@@ -493,6 +497,7 @@
     let isAutoPlaying = false;
     
     let narrationNames = [];
+    let standingX = 0;
     let standingY = 0;
     let standingSize = 100;
     let standingGap = 0;
@@ -623,11 +628,11 @@
       const fontStack = isMyeongjo ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
       screen.style.setProperty('--dialogue-font-family', fontStack);
       screen.style.setProperty('--dialogue-font-size', `${dialogueFontSize}px`);
-      screen.style.setProperty('--dialogue-letter-spacing', isMyeongjo ? '-0.04em' : 'normal');
-      screen.style.setProperty('--speaker-letter-spacing', isMyeongjo ? '-0.04em' : '1px');
+      screen.style.setProperty('--dialogue-letter-spacing', isMyeongjo ? '-0.3em' : 'normal');
+      screen.style.setProperty('--speaker-letter-spacing', isMyeongjo ? '-0.3em' : '1px');
       const standingContainer = document.getElementById('standing-container');
       standingContainer.classList.toggle('has-shadow', standingShadow);
-      standingContainer.style.transform = `translateY(${-standingY}px) scale(${standingSize / 100})`;
+      standingContainer.style.transform = `translate(${standingX}px, ${-standingY}px) scale(${standingSize / 100})`;
       if (updateStanding && currentIndex >= 0 && storyData.length) renderStandingPair(currentIndex);
     }
     function updatePreviewBackground(index) {
@@ -654,9 +659,19 @@
     document.getElementById('theme-select').addEventListener('change', e => { theme = e.target.value; applyPreviewSettings(); });
     document.getElementById('dialogue-font-select').addEventListener('change', e => { dialogueFont = e.target.value; applyPreviewSettings(); });
     document.getElementById('dialogue-font-size').addEventListener('change', e => { dialogueFontSize = Number(e.target.value); applyPreviewSettings(); });
+    document.getElementById('standing-x').addEventListener('input', e => { standingX = Number(e.target.value); document.getElementById('standing-x-value').textContent = `${standingX} px`; applyPreviewSettings(); if (currentIndex >= 0) renderPreview(currentIndex); });
     document.getElementById('standing-y').addEventListener('input', e => { standingY = Number(e.target.value); document.getElementById('standing-y-value').textContent = `${standingY} px`; applyPreviewSettings(); if (currentIndex >= 0) renderPreview(currentIndex); });
     document.getElementById('standing-gap').addEventListener('input', e => { standingGap = Number(e.target.value); document.getElementById('standing-gap-value').textContent = `${standingGap}%`; if (currentIndex >= 0) renderPreview(currentIndex); });
     document.getElementById('standing-size').addEventListener('input', e => { standingSize = Number(e.target.value); document.getElementById('standing-size-value').textContent = `${standingSize}%`; applyPreviewSettings(); if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('standing-position-reset').addEventListener('click', () => {
+      standingX = 0; standingY = 0;
+      document.getElementById('standing-x').value = 0;
+      document.getElementById('standing-y').value = 0;
+      document.getElementById('standing-x-value').textContent = '0 px';
+      document.getElementById('standing-y-value').textContent = '0 px';
+      applyPreviewSettings();
+      if (currentIndex >= 0) renderPreview(currentIndex);
+    });
     ['base-bg-x', 'base-bg-y', 'base-bg-zoom'].forEach(id => document.getElementById(id).addEventListener('input', e => { document.getElementById(id + '-value').textContent = `${e.target.value}%`; }));
     document.getElementById('standing-shadow').addEventListener('change', e => {
       standingShadow = e.target.checked;
@@ -1149,10 +1164,11 @@
       const characterPositionSettingsJson = JSON.stringify(characterPositionSettings);
       const standingGapValue = standingGap;
       const standingShadowValue = standingShadow;
+      const standingXValue = standingX;
       const dialogueFontFamilyValue = dialogueFont === 'myeongjo' ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
       const dialogueFontSizeValue = dialogueFontSize;
-      const dialogueLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.04em' : 'normal';
-      const speakerLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.04em' : '1px';
+      const dialogueLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.3em' : 'normal';
+      const speakerLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.3em' : '1px';
       const canvasWidthValue = canvasWidth;
       const canvasHeightValue = canvasHeight;
       
@@ -1201,7 +1217,7 @@
     #progress-slider::-moz-range-thumb { width:14px; height:14px; border:0; border-radius:50%; background:#fff; }
     
     #page-indicator { font-size: 15px; font-weight: bold; color: #ccc; min-width: 60px; text-align: right; }
-    #standing-container { position:absolute; inset:0; pointer-events:none; transform:translateY(${-standingY}px) scale(${standingSize / 100}); transform-origin:bottom center; transition:transform .2s ease; z-index:5; }
+    #standing-container { position:absolute; inset:0; pointer-events:none; transform:translate(${standingXValue}px, ${-standingY}px) scale(${standingSize / 100}); transform-origin:bottom center; transition:transform .2s ease; z-index:5; }
     .standing-character { position:absolute; bottom:0; left:50%; height:850px; width:auto; transform:translateX(-50%); transform-origin:bottom center; filter:none; transition:none; z-index:5; display:none; }
     #standing-container.has-shadow .standing-character { filter:drop-shadow(0 5px 10px rgba(0,0,0,.2)); }
     .standing-character.is-dimmed { filter:brightness(.55); }
