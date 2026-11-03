@@ -303,15 +303,16 @@
     .font-setting-row select { width:100%; min-width:0; box-sizing:border-box; padding:6px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-main); font-size:12px; }
     select { appearance:none; -webkit-appearance:none; padding-right:30px !important; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='m3 4.5 3 3 3-3' stroke='%23a1a1aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important; background-repeat:no-repeat !important; background-position:right 10px center !important; background-size:12px 12px !important; }
     .bgm-settings { gap:8px; }
-    .bgm-url-row { display:flex; gap:6px; min-width:0; }
-    .bgm-url-row input { flex:1; min-width:0; box-sizing:border-box; padding:7px 8px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-panel); font-size:11px; }
+    .bgm-upload-row { display:flex; align-items:center; gap:8px; min-width:0; }
+    .bgm-upload-btn { display:flex; align-items:center; justify-content:center; flex:0 0 auto; padding:7px 10px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-panel); font-size:11px; cursor:pointer; }
+    .bgm-upload-btn input { display:none; }
+    .bgm-file-name { min-width:0; overflow:hidden; color:var(--text-muted); font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
     .bgm-action-btn { flex:0 0 auto; padding:6px 9px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-panel); font-size:11px; cursor:pointer; }
     .bgm-control-row { display:flex; align-items:center; gap:8px; font-size:11px; }
     .bgm-control-row input[type="range"] { flex:1; min-width:0; accent-color:var(--accent); }
     .bgm-volume-value { flex:0 0 34px; text-align:right; color:var(--text-muted); font-variant-numeric:tabular-nums; }
     .bgm-status { min-height:14px; margin:0; color:var(--text-muted); font-size:10px; line-height:1.4; }
-    .bgm-player { width:220px; height:200px; max-width:100%; overflow:hidden; border-radius:6px; background:#000; }
-    .bgm-player iframe { display:block; max-width:100%; }
+    .bgm-audio { display:none; }
     .standing-adjust-grid .range-control-row { gap:3px; }
     .standing-adjust-grid .range-value { flex-basis:34px; width:34px; font-size:9px; }
 
@@ -417,10 +418,10 @@
         <p id="scene-bg-notice" class="scene-bg-notice" role="status" style="display:none;"></p>
       </section>
       <section class="background-settings-box bgm-settings">
-        <div class="sidebar-title" style="margin:0;">배경 음악 (YouTube)</div>
-        <div class="bgm-url-row">
-          <input type="url" id="bgm-url" placeholder="YouTube 링크를 입력하세요" aria-label="YouTube 배경 음악 링크">
-          <button type="button" id="bgm-apply" class="bgm-action-btn">적용</button>
+        <div class="sidebar-title" style="margin:0;">배경 음악</div>
+        <div class="bgm-upload-row">
+          <label class="bgm-upload-btn">오디오 업로드<input type="file" id="bgm-upload" accept="audio/*"></label>
+          <span id="bgm-file-name" class="bgm-file-name">선택된 파일 없음</span>
         </div>
         <div class="bgm-control-row">
           <button type="button" id="bgm-play-toggle" class="bgm-action-btn">재생</button>
@@ -428,8 +429,8 @@
           <input id="bgm-volume" type="range" min="0" max="100" value="35">
           <output id="bgm-volume-value" class="bgm-volume-value">35%</output>
         </div>
-        <div id="bgm-player" class="bgm-player" aria-label="YouTube 음악 플레이어"></div>
-        <p id="bgm-status" class="bgm-status" role="status">링크를 적용한 뒤 재생을 누르세요. 재생은 반복됩니다.</p>
+        <audio id="bgm-audio" class="bgm-audio" loop preload="metadata"></audio>
+        <p id="bgm-status" class="bgm-status" role="status">오디오 파일을 업로드한 뒤 재생을 누르세요. 음악은 반복됩니다.</p>
       </section>
       <div id="custom-ui-panel" style="display: none;">
         <div class="sidebar-title">화면 설정</div>
@@ -539,75 +540,43 @@
     let dialogueFont = "gothic";
     let dialogueFontSize = 20;
     let dialogueFontsRequested = false;
-    let bgmVideoId = '';
+    let bgmDataUrl = '';
     let bgmVolume = 35;
-    let bgmPlayer = null;
-    let bgmPendingPlay = false;
-
-    function parseYoutubeVideoId(value) {
-      try {
-        const url = new URL(String(value).trim());
-        const host = url.hostname.replace(/^www\./, '').toLowerCase();
-        let id = '';
-        if (host === 'youtu.be') id = url.pathname.split('/').filter(Boolean)[0] || '';
-        else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
-          id = url.searchParams.get('v') || url.pathname.match(/^\/(?:embed|shorts|live)\/([^/?]+)/)?.[1] || '';
-        }
-        return /^[\w-]{11}$/.test(id) ? id : '';
-      } catch (_) { return ''; }
-    }
+    const bgmAudio = document.getElementById('bgm-audio');
     function setBgmStatus(message) { document.getElementById('bgm-status').textContent = message; }
-    function createBgmPlayer() {
-      if (!bgmVideoId || !window.YT || !YT.Player) return;
-      if (bgmPlayer) { bgmPlayer.destroy(); bgmPlayer = null; }
-      const playerVars = { autoplay: 0, controls: 1, loop: 1, playlist: bgmVideoId, playsinline: 1, rel: 0 };
-      if (location.protocol !== 'file:' && location.origin !== 'null') playerVars.origin = location.origin;
-      bgmPlayer = new YT.Player('bgm-player', {
-        width: '220', height: '200', videoId: bgmVideoId,
-        playerVars,
-        events: {
-          onReady: event => {
-            event.target.setVolume(bgmVolume);
-            setBgmStatus('음악을 반복 재생합니다. 재생이 막히면 재생 버튼을 누르세요.');
-            if (bgmPendingPlay) startBgm();
-          },
-          onStateChange: event => {
-            document.getElementById('bgm-play-toggle').textContent = event.data === YT.PlayerState.PLAYING ? '일시정지' : '재생';
-          },
-          onAutoplayBlocked: () => setBgmStatus('브라우저가 자동 재생을 막았습니다. 재생 버튼을 눌러 시작하세요.'),
-          onError: () => setBgmStatus('이 영상은 재생할 수 없습니다. 링크를 확인해 주세요.')
-        }
-      });
-    }
-    function applyBgmLink() {
-      const id = parseYoutubeVideoId(document.getElementById('bgm-url').value);
-      if (!id) { setBgmStatus('유효한 YouTube 영상 링크를 입력해 주세요.'); return; }
-      bgmVideoId = id;
-      bgmPendingPlay = true;
-      if (window.YT && YT.Player) createBgmPlayer();
-      else setBgmStatus('YouTube 플레이어를 불러오는 중입니다. 준비되면 재생을 시도합니다.');
-    }
+    document.getElementById('bgm-upload').addEventListener('change', event => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (file.type && !file.type.startsWith('audio/')) { setBgmStatus('오디오 파일을 선택해 주세요.'); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        bgmDataUrl = String(reader.result || '');
+        bgmAudio.src = bgmDataUrl;
+        bgmAudio.load();
+        document.getElementById('bgm-file-name').textContent = file.name;
+        document.getElementById('bgm-play-toggle').textContent = '재생';
+        setBgmStatus('오디오 파일을 준비했습니다. 재생을 누르면 반복됩니다.');
+      };
+      reader.onerror = () => setBgmStatus('오디오 파일을 읽지 못했습니다.');
+      reader.readAsDataURL(file);
+    });
     function startBgm() {
-      if (!bgmPlayer || !bgmVideoId) { bgmPendingPlay = true; setBgmStatus('먼저 YouTube 링크를 적용해 주세요.'); return; }
-      bgmPendingPlay = false;
-      bgmPlayer.unMute();
-      bgmPlayer.setVolume(bgmVolume);
-      bgmPlayer.playVideo();
+      if (!bgmDataUrl) { setBgmStatus('먼저 오디오 파일을 업로드해 주세요.'); return; }
+      bgmAudio.volume = bgmVolume / 100;
+      bgmAudio.play().then(() => setBgmStatus('오디오를 반복 재생 중입니다.')).catch(() => setBgmStatus('재생할 수 없는 오디오 형식이거나 브라우저가 재생을 막았습니다.'));
     }
     function toggleBgm() {
-      if (bgmPlayer && bgmPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-        bgmPendingPlay = false;
-        bgmPlayer.pauseVideo();
-      } else startBgm();
+      if (!bgmAudio.paused) { bgmAudio.pause(); document.getElementById('bgm-play-toggle').textContent = '재생'; }
+      else startBgm();
     }
-    window.onYouTubeIframeAPIReady = () => { if (bgmVideoId) createBgmPlayer(); };
-    document.getElementById('bgm-apply').addEventListener('click', applyBgmLink);
-    document.getElementById('bgm-url').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); applyBgmLink(); } });
+    bgmAudio.addEventListener('play', () => { document.getElementById('bgm-play-toggle').textContent = '일시정지'; });
+    bgmAudio.addEventListener('pause', () => { document.getElementById('bgm-play-toggle').textContent = '재생'; });
+    bgmAudio.addEventListener('error', () => { if (bgmDataUrl) setBgmStatus('이 오디오 파일은 브라우저에서 재생할 수 없습니다.'); });
     document.getElementById('bgm-play-toggle').addEventListener('click', toggleBgm);
     document.getElementById('bgm-volume').addEventListener('input', e => {
       bgmVolume = Number(e.target.value);
       document.getElementById('bgm-volume-value').textContent = `${bgmVolume}%`;
-      if (bgmPlayer) bgmPlayer.setVolume(bgmVolume);
+      bgmAudio.volume = bgmVolume / 100;
     });
 
     function scalePreview() {
@@ -1100,7 +1069,7 @@
 
     document.getElementById('auto-play-btn').addEventListener('click', function(e) {
         e.stopPropagation();
-        if (bgmPlayer && bgmVideoId && bgmPlayer.getPlayerState() !== YT.PlayerState.PLAYING) startBgm();
+        if (bgmDataUrl && bgmAudio.paused) startBgm();
         toggleAutoPlay();
     });
 
@@ -1226,7 +1195,7 @@
     });
 
     document.getElementById('preview-screen').addEventListener('click', function() {
-      if (bgmPlayer && bgmVideoId && bgmPlayer.getPlayerState() !== YT.PlayerState.PLAYING) startBgm();
+      if (bgmDataUrl && bgmAudio.paused) startBgm();
       if (storyData.length === 0) return;
       if (isTyping) {
         clearInterval(typeInterval);
@@ -1269,7 +1238,6 @@
       const speakerLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.03em' : '1px';
       const canvasWidthValue = canvasWidth;
       const canvasHeightValue = canvasHeight;
-      const bgmVideoIdValue = bgmVideoId;
       const bgmVolumeValue = bgmVolume;
       
       const finalHTML = `<!DOCTYPE html>
@@ -1301,10 +1269,10 @@
     body { margin: 0; padding: 0; background-color: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'Noto Sans KR', sans-serif; }
     #viewer-layout { position:relative; flex-shrink:0; }
     #viewer-screen { width: ${canvasWidth}px; height: ${canvasHeight}px; background-color: #111; background-image: url('${bgBase64}'); background-size: contain; background-position: 50% 50%; background-repeat:no-repeat; position: absolute; cursor: pointer; flex-shrink: 0; transform-origin: top left; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
-    #replay-bgm { position:absolute; display:flex; flex-direction:column; gap:8px; width:220px; color:#fff; font:12px 'Noto Sans KR',sans-serif; }
-    #bgm-player { width:220px; height:200px; overflow:hidden; background:#000; }
-    #bgm-player iframe { display:block; max-width:100%; }
+    #replay-bgm { position:absolute; display:flex; flex-direction:column; gap:8px; width:210px; color:#fff; font:12px 'Noto Sans KR',sans-serif; }
+    #replay-bgm-audio { display:none; }
     #replay-bgm-controls { display:flex; align-items:center; gap:7px; }
+    #replay-bgm-heading { margin:0; color:#ddd; font-size:11px; }
     #replay-bgm-controls button { flex:0 0 auto; border:1px solid #555; border-radius:5px; background:#222; color:#fff; padding:5px 8px; cursor:pointer; }
     #replay-bgm-controls input { min-width:0; flex:1; accent-color:#fff; }
     #bgm-volume-value { color:#ccc; font-variant-numeric:tabular-nums; }
@@ -1377,58 +1345,52 @@
     </div>
     <div id="log-view" role="log" aria-label="이전 대화 로그"><div id="log-text"></div></div>
   </div>
-  ${bgmVideoIdValue ? '<aside id="replay-bgm" aria-label="배경 음악"><div id="bgm-player"></div><div id="replay-bgm-controls"><button type="button" id="bgm-play-toggle">재생</button><label for="bgm-volume">음량</label><input id="bgm-volume" type="range" min="0" max="100" value="' + bgmVolumeValue + '"><span id="bgm-volume-value">' + bgmVolumeValue + '%</span></div><p id="bgm-status">음악이 반복 재생됩니다. 재생이 막히면 재생 버튼을 누르세요.</p></aside>' : ''}
+  ${bgmDataUrl ? '<aside id="replay-bgm" aria-label="배경 음악"><p id="replay-bgm-heading">배경 음악</p><audio id="replay-bgm-audio" loop preload="auto" src="' + bgmDataUrl + '"></audio><div id="replay-bgm-controls"><button type="button" id="bgm-play-toggle">재생</button><label for="bgm-volume">음량</label><input id="bgm-volume" type="range" min="0" max="100" value="' + bgmVolumeValue + '"><span id="bgm-volume-value">' + bgmVolumeValue + '%</span></div><p id="bgm-status">음악은 반복 재생됩니다.</p></aside>' : ''}
   </div>
   <script>
     const canvasWidth = ${canvasWidthValue};
     const canvasHeight = ${canvasHeightValue};
-    const bgmVideoId = '${bgmVideoIdValue}';
     const bgmVolume = ${bgmVolumeValue};
-    let bgmPlayer = null;
+    const bgmAudio = document.getElementById('replay-bgm-audio');
     function startReplayBgm() {
-      if (!bgmPlayer) return;
-      bgmPlayer.unMute(); bgmPlayer.setVolume(bgmVolume); bgmPlayer.playVideo();
+      if (!bgmAudio) return;
+      bgmAudio.volume = bgmVolume / 100;
+      bgmAudio.play().catch(() => { const status=document.getElementById('bgm-status'); if(status) status.textContent='재생을 시작할 수 없습니다. 재생 버튼을 눌러 주세요.'; });
     }
-    function onYouTubeIframeAPIReady() {
-      if (!bgmVideoId) return;
-      const playerVars={ autoplay:0, controls:1, loop:1, playlist:bgmVideoId, playsinline:1, rel:0 };
-      if (location.protocol !== 'file:' && location.origin !== 'null') playerVars.origin=location.origin;
-      bgmPlayer = new YT.Player('bgm-player', { width:'220', height:'200', videoId:bgmVideoId, playerVars, events:{
-        onReady:event => { event.target.setVolume(bgmVolume); },
-        onStateChange:event => { const button=document.getElementById('bgm-play-toggle'); if(button) button.textContent=event.data===YT.PlayerState.PLAYING?'일시정지':'재생'; },
-        onAutoplayBlocked:() => { const status=document.getElementById('bgm-status'); if(status) status.textContent='브라우저가 자동 재생을 막았습니다. 재생 버튼을 눌러 시작하세요.'; },
-        onError:() => { const status=document.getElementById('bgm-status'); if(status) status.textContent='이 YouTube 영상을 재생할 수 없습니다.'; }
-      }});
-    }
-    if (bgmVideoId) { const apiScript=document.createElement('script'); apiScript.src='https://www.youtube.com/iframe_api'; document.head.appendChild(apiScript); }
+    if (bgmAudio) bgmAudio.volume = bgmVolume / 100;
     function scaleScreen() {
       const screen = document.getElementById('viewer-screen');
       const layout = document.getElementById('viewer-layout');
       const bgmPanel = document.getElementById('replay-bgm');
-      const extraWidth = bgmPanel ? 232 : 0;
+      const extraWidth = bgmPanel ? 222 : 0;
       const scale = Math.max(.1, Math.min(1, (window.innerWidth - extraWidth) / canvasWidth, window.innerHeight / canvasHeight));
       const scaledWidth = canvasWidth * scale;
       const scaledHeight = canvasHeight * scale;
-      const layoutHeight = Math.max(scaledHeight, bgmPanel ? 200 : 0);
+      const layoutHeight = scaledHeight;
       layout.style.width = \`\${scaledWidth + extraWidth}px\`;
       layout.style.height = \`\${layoutHeight}px\`;
       screen.style.left = '0';
       screen.style.top = \`\${(layoutHeight - scaledHeight) / 2}px\`;
       screen.style.transform = \`scale(\${scale})\`;
-      if (bgmPanel) { bgmPanel.style.left = \`\${scaledWidth + 12}px\`; bgmPanel.style.top = \`\${(layoutHeight - 200) / 2}px\`; }
+      if (bgmPanel) { bgmPanel.style.left = \`\${scaledWidth + 12}px\`; bgmPanel.style.top = \`\${Math.max(8, (layoutHeight - 90) / 2)}px\`; }
     }
     window.addEventListener('resize', scaleScreen);
     scaleScreen();
     const replayBgmToggle = document.getElementById('bgm-play-toggle');
     if (replayBgmToggle) replayBgmToggle.addEventListener('click', e => {
       e.stopPropagation();
-      if (bgmPlayer && bgmPlayer.getPlayerState() === YT.PlayerState.PLAYING) { bgmPlayer.pauseVideo(); replayBgmToggle.textContent='재생'; }
+      if (bgmAudio && !bgmAudio.paused) { bgmAudio.pause(); replayBgmToggle.textContent='재생'; }
       else startReplayBgm();
     });
+    if (bgmAudio) {
+      bgmAudio.addEventListener('play', () => { if(replayBgmToggle) replayBgmToggle.textContent='일시정지'; });
+      bgmAudio.addEventListener('pause', () => { if(replayBgmToggle) replayBgmToggle.textContent='재생'; });
+      bgmAudio.addEventListener('error', () => { const status=document.getElementById('bgm-status'); if(status) status.textContent='이 오디오 파일은 브라우저에서 재생할 수 없습니다.'; });
+    }
     const replayBgmVolume = document.getElementById('bgm-volume');
     if (replayBgmVolume) replayBgmVolume.addEventListener('input', e => {
       const value=Number(e.target.value); document.getElementById('bgm-volume-value').textContent=\`\${value}%\`;
-      if (bgmPlayer) bgmPlayer.setVolume(value);
+      if (bgmAudio) bgmAudio.volume = value / 100;
     });
 
     const storyData = ${storyJson};
@@ -1650,7 +1612,7 @@
 
     document.getElementById('auto-play-btn').addEventListener('click', function(e) {
         e.stopPropagation();
-        if (bgmPlayer && bgmPlayer.getPlayerState() !== YT.PlayerState.PLAYING) startReplayBgm();
+        if (bgmAudio && bgmAudio.paused) startReplayBgm();
         toggleAutoPlay();
     });
 
@@ -1695,7 +1657,7 @@
     }, { passive:false });
 
     document.getElementById('viewer-screen').addEventListener('click', function() {
-      if (bgmPlayer && bgmPlayer.getPlayerState() !== YT.PlayerState.PLAYING) startReplayBgm();
+      if (bgmAudio && bgmAudio.paused) startReplayBgm();
       if (currentIndex === -1) { currentIndex = 0; renderScene(currentIndex); return; }
       if (isTyping) {
         clearInterval(typeInterval); 
@@ -1741,6 +1703,5 @@
       URL.revokeObjectURL(url);
     });
   </script>
-  <script src="https://www.youtube.com/iframe_api" async></script>
 </body>
 </html>
