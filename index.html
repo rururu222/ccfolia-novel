@@ -147,6 +147,30 @@
     .setting-label { color:var(--text-muted); font-size:12px; white-space:nowrap; }
     .setting-hint { color:var(--text-muted); font-size:11px; line-height:1.5; }
     #character-position-controls { display:flex; flex-direction:column; gap:8px; }
+    .sidebar-tabs { display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:3px; margin-bottom:6px; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); flex-shrink:0; }
+    .sidebar-tab { padding:7px 0; border:0; border-radius:6px; color:var(--text-muted); background:transparent; font-size:13px; font-weight:600; cursor:pointer; transition:background-color .15s, color .15s; }
+    .sidebar-tab:hover { color:var(--text-main); }
+    .sidebar-tab.is-active { color:var(--text-main); background:var(--bg-panel); }
+    .sidebar-tab-panel { display:flex; flex-direction:column; gap:8px; min-width:0; }
+    .sidebar-tab-panel[hidden] { display:none; }
+    .log-editor-summary { display:flex; align-items:center; justify-content:space-between; gap:8px; color:var(--text-muted); font-size:12px; }
+    .log-editor-link { padding:0; border:0; color:var(--text-main); background:transparent; font-size:12px; text-decoration:underline; cursor:pointer; }
+    .log-editor-list { display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .log-row { display:grid; grid-template-columns:minmax(0,1fr) 28px; align-items:center; gap:4px; border-radius:6px; }
+    .log-row:hover { background:var(--bg-main); }
+    .log-row.is-current { background:var(--bg-main); box-shadow:inset 2px 0 0 var(--accent); }
+    .log-row-main { display:grid; grid-template-columns:30px minmax(0,1fr); gap:6px; min-width:0; padding:6px 4px 6px 6px; border:0; color:var(--text-main); background:transparent; text-align:left; cursor:pointer; }
+    .log-row-index { color:var(--text-muted); font-size:10px; font-variant-numeric:tabular-nums; line-height:1.6; }
+    .log-row-body { min-width:0; font-size:12px; line-height:1.45; }
+    .log-row-name { display:block; font-weight:600; font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .log-row-text { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; color:var(--text-main); word-break:break-all; }
+    .log-row-toggle { width:28px; height:28px; display:flex; align-items:center; justify-content:center; padding:0; border:0; border-radius:5px; color:var(--text-muted); background:transparent; cursor:pointer; }
+    .log-row-toggle:hover { color:var(--text-main); }
+    .log-row-toggle svg { width:15px; height:15px; }
+    .log-row-toggle .icon-hidden, .log-row.is-hidden .log-row-toggle .icon-visible { display:none; }
+    .log-row.is-hidden .log-row-toggle .icon-hidden { display:block; }
+    .log-row.is-hidden .log-row-main { opacity:.35; }
+    .log-row.is-hidden .log-row-text { text-decoration:line-through; }
     .title-toggle-heading { display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
     .title-toggle-heading input { width:16px; height:16px; margin:0; accent-color:var(--accent); }
     #title-settings-controls { display:none; flex-direction:column; gap:8px; min-width:0; }
@@ -452,6 +476,11 @@
 
   <div class="app-container">
     <div class="sidebar">
+      <div class="sidebar-tabs" role="tablist" aria-label="편집 패널">
+        <button type="button" class="sidebar-tab is-active" role="tab" id="tab-btn-settings" aria-controls="tab-settings" aria-selected="true" data-tab="settings">설정</button>
+        <button type="button" class="sidebar-tab" role="tab" id="tab-btn-log" aria-controls="tab-log" aria-selected="false" data-tab="log">로그 편집</button>
+      </div>
+      <div id="tab-settings" class="sidebar-tab-panel" role="tabpanel" aria-labelledby="tab-btn-settings">
       <div class="sidebar-title">기본 리소스</div>
       <label class="upload-btn" id="lbl-html">
         <span class="resource-step-title">1. HTML 로그 업로드</span>
@@ -603,6 +632,11 @@
         </section>
       </div>
       <!-- ㅇ -->
+      </div>
+      <div id="tab-log" class="sidebar-tab-panel" role="tabpanel" aria-labelledby="tab-btn-log" hidden>
+        <div class="log-editor-summary"><span id="log-editor-count">불러온 로그가 없습니다.</span><button type="button" id="log-editor-show-all" class="log-editor-link" hidden>모두 표시</button></div>
+        <div id="log-editor-list" class="log-editor-list"></div>
+      </div>
 
       <button class="download-btn" id="download-btn" disabled style="margin-top: auto;">웹 뷰어 다운로드 (.html)</button>
     </div>
@@ -639,6 +673,51 @@
 
   <script>
     let storyData = [];
+    let hiddenLines = new Set();
+    let hiddenLinesSource = null;
+    const LOG_EYE_ICONS = '<span class="icon-visible"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="icon-hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.6 6.6C3.8 8.4 2 12 2 12s3.5 7 10 7c1.9 0 3.6-.6 5-1.4"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>';
+    function syncHiddenLinesSource() {
+      if (hiddenLinesSource !== storyData) { hiddenLines = new Set(); hiddenLinesSource = storyData; }
+    }
+    function updateLogEditorSummary() {
+      const count = document.getElementById('log-editor-count');
+      const showAll = document.getElementById('log-editor-show-all');
+      if (!storyData.length) { count.textContent = '불러온 로그가 없습니다.'; showAll.hidden = true; return; }
+      count.textContent = `전체 ${storyData.length}줄` + (hiddenLines.size ? ` · 숨김 ${hiddenLines.size}줄` : '');
+      showAll.hidden = hiddenLines.size === 0;
+    }
+    function renderLogEditor() {
+      syncHiddenLinesSource();
+      const list = document.getElementById('log-editor-list');
+      const fragment = document.createDocumentFragment();
+      storyData.forEach((scene, index) => {
+        const row = document.createElement('div');
+        row.className = 'log-row' + (hiddenLines.has(index) ? ' is-hidden' : '') + (index === currentIndex ? ' is-current' : '');
+        row.dataset.index = index;
+        const main = document.createElement('button'); main.type = 'button'; main.className = 'log-row-main'; main.title = '이 대사로 이동';
+        const num = document.createElement('span'); num.className = 'log-row-index'; num.textContent = index + 1;
+        const body = document.createElement('span'); body.className = 'log-row-body';
+        const name = String(scene.name || '').trim();
+        if (name && name !== '-') { const nameEl = document.createElement('span'); nameEl.className = 'log-row-name'; nameEl.textContent = name; if (scene.color) nameEl.style.color = scene.color; body.appendChild(nameEl); }
+        const text = document.createElement('span'); text.className = 'log-row-text'; text.textContent = String(scene.text || '').trim() || '(빈 대사)'; body.appendChild(text);
+        main.append(num, body);
+        const toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'log-row-toggle';
+        toggle.innerHTML = LOG_EYE_ICONS;
+        setLogToggleLabel(toggle, hiddenLines.has(index));
+        row.append(main, toggle); fragment.appendChild(row);
+      });
+      list.replaceChildren(fragment);
+      updateLogEditorSummary();
+    }
+    function setLogToggleLabel(toggle, isHidden) {
+      const label = isHidden ? '숨김 해제' : '숨기기';
+      toggle.setAttribute('aria-label', label); toggle.title = label; toggle.setAttribute('aria-pressed', String(isHidden));
+    }
+    function markCurrentLogRow() {
+      const list = document.getElementById('log-editor-list');
+      const previous = list.querySelector('.log-row.is-current'); if (previous) previous.classList.remove('is-current');
+      const row = list.querySelector(`.log-row[data-index="${currentIndex}"]`); if (row) row.classList.add('is-current');
+    }
     let bgBase64 = "";
     let sceneBackgrounds = [];
     const baseBackgroundSettings = { x: 50, y: 50, zoom: 0 };
@@ -1219,6 +1298,9 @@
     }
 
     function renderPreview(index) {
+      while (index < storyData.length && hiddenLines.has(index)) index++;
+      currentIndex = index;
+      markCurrentLogRow();
       if (index >= storyData.length) {
         if (isAutoPlaying) toggleAutoPlay();
         alert("미리보기 대본이 끝났습니다.");
@@ -1364,6 +1446,7 @@
     }
 
     function checkReady() {
+        renderLogEditor();
         updateSceneBackgroundAvailability();
         if(storyData.length > 0) {
              preloadDialogueFonts();
@@ -1472,6 +1555,44 @@
       showPreviewTitle();
     });
 
+    document.querySelectorAll('.sidebar-tab').forEach(tab => tab.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-tab').forEach(other => {
+        const active = other === tab;
+        other.classList.toggle('is-active', active); other.setAttribute('aria-selected', String(active));
+        document.getElementById('tab-' + other.dataset.tab).hidden = !active;
+      });
+      if (tab.dataset.tab === 'log') { const current = document.querySelector('.log-row.is-current'); if (current) current.scrollIntoView({ block: 'center' }); }
+    }));
+    document.getElementById('log-editor-list').addEventListener('click', e => {
+      const row = e.target.closest('.log-row'); if (!row) return;
+      const index = Number(row.dataset.index);
+      if (e.target.closest('.log-row-toggle')) {
+        if (hiddenLines.has(index)) hiddenLines.delete(index); else hiddenLines.add(index);
+        const isHidden = hiddenLines.has(index);
+        row.classList.toggle('is-hidden', isHidden);
+        setLogToggleLabel(row.querySelector('.log-row-toggle'), isHidden);
+        updateLogEditorSummary();
+        if (index === currentIndex && isHidden && !isPreviewTitleShowing()) { clearInterval(typeInterval); isTyping = false; renderPreview(currentIndex); }
+        return;
+      }
+      if (e.target.closest('.log-row-main')) {
+        if (document.getElementById('title-card').classList.contains('is-visible')) {
+          clearTimeout(titleHideTimer);
+          document.getElementById('title-card').classList.remove('is-visible', 'is-leaving');
+          document.getElementById('preview-screen').classList.remove('is-title-showing');
+        }
+        if (isAutoPlaying) toggleAutoPlay();
+        clearInterval(typeInterval); clearTimeout(autoPlayTimeout); isTyping = false;
+        if (hiddenLines.has(index)) { hiddenLines.delete(index); row.classList.remove('is-hidden'); setLogToggleLabel(row.querySelector('.log-row-toggle'), false); updateLogEditorSummary(); }
+        renderPreview(index);
+      }
+    });
+    document.getElementById('log-editor-show-all').addEventListener('click', () => {
+      hiddenLines.clear();
+      document.querySelectorAll('.log-row.is-hidden').forEach(row => { row.classList.remove('is-hidden'); setLogToggleLabel(row.querySelector('.log-row-toggle'), false); });
+      updateLogEditorSummary();
+    });
+
     document.getElementById('preview-screen').addEventListener('click', function() {
       if (bgmDataUrl && bgmAudio.paused) startBgm();
       if (isPreviewTitleShowing()) { hidePreviewTitle(); return; }
@@ -1501,9 +1622,18 @@
     document.getElementById('download-btn').addEventListener('click', function() {
       if (storyData.length === 0) return;
       
-      const storyJson = JSON.stringify(storyData);
+      const visibleIndices = storyData.map((_, index) => index).filter(index => !hiddenLines.has(index));
+      if (!visibleIndices.length) { alert('모든 대사가 숨김 상태입니다. 로그 편집 탭에서 하나 이상 표시해 주세요.'); return; }
+      const exportIndexMap = new Map(visibleIndices.map((oldIndex, newIndex) => [oldIndex, newIndex]));
+      const exportStoryData = visibleIndices.map(index => storyData[index]);
+      const exportSceneBackgrounds = sceneBackgrounds.map(item => {
+        const inRange = visibleIndices.filter(index => index >= item.start && index <= item.end);
+        if (!inRange.length) return null;
+        return Object.assign({}, item, { start: exportIndexMap.get(inRange[0]), end: exportIndexMap.get(inRange[inRange.length - 1]) });
+      }).filter(Boolean);
+      const storyJson = JSON.stringify(exportStoryData);
       const imageMapJson = JSON.stringify(highResImageMap); // 용량 최적화: 중복 없는 이미지 사전 생성
-      const sceneBackgroundsJson = JSON.stringify(sceneBackgrounds);
+      const sceneBackgroundsJson = JSON.stringify(exportSceneBackgrounds);
       const narrationNamesJson = JSON.stringify(narrationNames);
       const baseBackgroundSettingsJson = JSON.stringify(baseBackgroundSettings);
       const characterStandingSettingsJson = JSON.stringify(characterStandingSettings);
