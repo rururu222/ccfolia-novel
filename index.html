@@ -914,8 +914,9 @@
 
     function populateCharacterNames() {
       const names = [...new Set(storyData.map(scene => String(scene.name || '').trim()).filter(name => name && name !== '-'))];
-      narrationNames = narrationNames.filter(name => names.includes(name));
-      renderNameCheckboxes('narration-name-list', names, narrationNames, selected => { narrationNames = selected; if (currentIndex >= 0) renderPreview(currentIndex); });
+      const narrationCandidates = [...new Set(storyData.map(scene => String(scene.name || '').trim()).filter(Boolean))];
+      narrationNames = narrationNames.filter(name => narrationCandidates.includes(name));
+      renderNameCheckboxes('narration-name-list', narrationCandidates, narrationNames, selected => { narrationNames = selected; if (currentIndex >= 0) renderPreview(currentIndex); });
       const standingSelect = document.getElementById('standing-character-select');
       const previousStandingName = activeStandingCharacter;
       standingSelect.replaceChildren(...names.map(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; return option; }));
