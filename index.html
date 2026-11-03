@@ -352,7 +352,10 @@
     .font-setting-row select { width:100%; min-width:0; box-sizing:border-box; padding:7px 10px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background-color:var(--bg-main); font-size:12px; }
     select { appearance:none; -webkit-appearance:none; padding-right:30px !important; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='m3 4.5 3 3 3-3' stroke='%23a1a1aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important; background-repeat:no-repeat !important; background-position:right 10px center !important; background-size:12px 12px !important; }
     .bgm-settings { display:flex; flex-direction:column; gap:10px; min-width:0; }
-    .bgm-file-row { display:grid; grid-template-columns:24px minmax(0,1fr); align-items:center; gap:7px; min-width:0; }
+    .bgm-file-row { display:grid; grid-template-columns:24px minmax(0,1fr); align-items:center; gap:7px; min-width:0; padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); cursor:pointer; transition:.2s; }
+    .bgm-file-row:hover { border-color:#71717a; background-color:#202023; }
+    .bgm-file-row:focus-within { border-color:var(--accent); }
+    .bgm-file-row input { display:none; }
     .bgm-volume-row { display:grid; grid-template-columns:24px 16px minmax(0,1fr); align-items:center; gap:7px; min-width:0; }
     .bgm-upload-btn { width:24px; height:24px; display:flex; align-items:center; justify-content:center; border:0; border-radius:0; background:transparent; color:var(--text-main); cursor:pointer; }
     .bgm-upload-btn svg { width:18px; height:18px; }
@@ -467,10 +470,11 @@
       <div id="custom-ui-panel" style="display: none;">
         <section class="settings-group bgm-settings">
           <div class="sidebar-title">BGM</div>
-          <div class="bgm-file-row">
-            <label class="bgm-upload-btn" title="배경 음악 업로드" aria-label="배경 음악 업로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg><input type="file" id="bgm-upload" accept="audio/*"></label>
+          <label class="bgm-file-row" title="배경 음악 업로드" aria-label="배경 음악 업로드">
+            <span class="bgm-upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg></span>
             <span id="bgm-file-name" class="bgm-file-name">선택된 파일 없음</span>
-          </div>
+            <input type="file" id="bgm-upload" accept="audio/*">
+          </label>
           <div class="bgm-volume-row">
             <button type="button" id="bgm-play-toggle" class="bgm-icon-btn" aria-label="재생" title="재생"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg></button>
             <svg class="bgm-volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M16 9a5 5 0 0 1 0 6m2.5-8.5a8.5 8.5 0 0 1 0 11"/></svg>
