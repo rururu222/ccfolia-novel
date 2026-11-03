@@ -534,10 +534,11 @@
           <div class="standing-xy-inputs">
             <label class="standing-mini-control"><span>X</span><input id="character-standing-x" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-x-value">0 px</small></label>
             <label class="standing-mini-control"><span>Y</span><input id="character-standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-y-value">0 px</small></label>
-            <button type="button" id="character-standing-reset" class="bg-reset-icon" aria-label="선택한 캐릭터 조정 초기화" title="선택한 캐릭터 조정 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+            <button type="button" id="character-standing-position-reset" class="bg-reset-icon" aria-label="캐릭터 위치 초기화" title="캐릭터 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
           </div>
           <div class="standing-size-row">
             <label class="standing-mini-control"><span>S</span><input id="character-standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="character-standing-size-value">100%</small></label>
+            <button type="button" id="character-standing-size-reset" class="bg-reset-icon" aria-label="캐릭터 크기 초기화" title="캐릭터 크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
           </div>
         </div>
         </section>
@@ -874,12 +875,16 @@
       container.querySelectorAll('.standing-character').forEach(img => { img.style.transition = ''; });
       container.classList.remove('instant-shadow-change');
     });
-    document.getElementById('character-standing-reset').addEventListener('click', () => {
+    function resetCharacterStanding(values) {
       if (!activeStandingCharacter) return;
-      delete characterStandingSettings[activeStandingCharacter];
+      const setting = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 };
+      Object.assign(setting, values);
+      characterStandingSettings[activeStandingCharacter] = setting;
       updateCharacterStandingControls();
       if (currentIndex >= 0) renderPreview(currentIndex);
-    });
+    }
+    document.getElementById('character-standing-position-reset').addEventListener('click', () => resetCharacterStanding({ x: 0, y: 0 }));
+    document.getElementById('character-standing-size-reset').addEventListener('click', () => resetCharacterStanding({ size: 100 }));
     document.getElementById('standing-character-select').addEventListener('change', e => { activeStandingCharacter = e.target.value; updateCharacterStandingControls(); });
     document.getElementById('character-standing-x').addEventListener('input', e => { const setting = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 }; setting.x = Number(e.target.value); characterStandingSettings[activeStandingCharacter] = setting; document.getElementById('character-standing-x-value').textContent = `${setting.x} px`; if (currentIndex >= 0) renderPreview(currentIndex); });
     document.getElementById('character-standing-y').addEventListener('input', e => { const setting = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 }; setting.y = Number(e.target.value); characterStandingSettings[activeStandingCharacter] = setting; document.getElementById('character-standing-y-value').textContent = `${setting.y} px`; if (currentIndex >= 0) renderPreview(currentIndex); });
@@ -1843,6 +1848,7 @@
       if (e.target.closest && e.target.closest('#bottom-ui')) return;
       if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); document.getElementById('viewer-screen').click(); }
     });
+    if (storyData.length) { currentIndex = 0; renderScene(currentIndex); }
   <\/script>
 </body>
 </html>`;
