@@ -315,7 +315,6 @@
     .bg-reset-icon { width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; padding:0; border:0; border-radius:0; color:var(--text-muted); background:transparent; cursor:pointer; }
     .bg-reset-icon svg { width:13px; height:13px; }
     .bg-reset-icon:hover { color:var(--text-main); background:transparent; }
-    .scene-bg-notice { margin:0; color:#dc2626; font-size:11px; line-height:1.4; }
     .bg-mini-control { min-width:0; display:grid; grid-template-columns:10px minmax(0,1fr); align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; }
     .bg-mini-control.bg-size-control { grid-template-columns:10px minmax(0,1fr); }
     .bg-mini-control input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
@@ -465,7 +464,6 @@
         <div id="scene-bg-list" style="display:flex; flex-direction:column; gap:8px; min-width:0;">
           <button class="upload-btn" id="add-scene-bg" type="button" aria-disabled="true" style="justify-content:center; opacity:.55; padding:9px; cursor:not-allowed;">＋ 구간별 배경 이미지 추가</button>
         </div>
-        <p id="scene-bg-notice" class="scene-bg-notice" role="status" style="display:none;"></p>
       </section>
       <div id="custom-ui-panel" style="display: none;">
         <section class="settings-group bgm-settings">
@@ -828,14 +826,12 @@
     }
     function updateSceneBackgroundAvailability() {
       const button = document.getElementById('add-scene-bg');
-      const notice = document.getElementById('scene-bg-notice');
       const hasBaseBackground = Boolean(bgBase64);
       const hasStory = storyData.length > 0;
       const unavailable = !(hasBaseBackground && hasStory);
       button.setAttribute('aria-disabled', String(unavailable));
       button.style.opacity = unavailable ? '.55' : '1';
       button.style.cursor = unavailable ? 'not-allowed' : 'pointer';
-      if (!unavailable) notice.style.display = 'none';
     }
     document.getElementById('theme-select').addEventListener('change', e => { theme = e.target.value; applyPreviewSettings(); });
     document.getElementById('dialogue-font-select').addEventListener('change', e => { dialogueFont = e.target.value; applyPreviewSettings(); });
@@ -963,17 +959,7 @@
       end.addEventListener('change', () => { item.end = Number(end.value); if (item.end < item.start) { item.start = item.end; start.value = item.start; } updatePreviewBackground(currentIndex); });
     }
     document.getElementById('add-scene-bg').addEventListener('click', () => {
-      const notice = document.getElementById('scene-bg-notice');
-      if (!bgBase64) {
-        notice.style.display = 'none';
-        return;
-      }
-      if (!storyData.length) {
-        notice.textContent = '구간별 위치를 지정하려면 HTML 로그를 먼저 업로드하세요.';
-        notice.style.display = 'block';
-        return;
-      }
-      notice.style.display = 'none';
+      if (!bgBase64 || !storyData.length) return;
       addSceneBackgroundRow();
     });
 
