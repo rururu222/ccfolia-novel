@@ -152,7 +152,8 @@
     #title-settings-controls { display:none; flex-direction:column; gap:8px; min-width:0; }
     #title-settings-controls.is-open { display:flex; }
     #title-text-fields { display:flex; flex-direction:column; gap:8px; min-width:0; }
-    #title-settings-controls[data-mode="text"] #title-image-field, #title-settings-controls[data-mode="image"] #title-text-fields { display:none; }
+    #title-image-fields { display:flex; flex-direction:column; gap:6px; min-width:0; }
+    #title-settings-controls[data-mode="text"] #title-image-fields, #title-settings-controls[data-mode="image"] #title-text-fields { display:none; }
     .title-field { display:flex; flex-direction:column; gap:4px; min-width:0; }
     .title-field input[type="text"], .title-field textarea { width:100%; min-width:0; box-sizing:border-box; padding:6px 8px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-main); font-size:12px; font-family:inherit; resize:vertical; }
     .title-field input[type="text"]:focus, .title-field textarea:focus { outline:none; border-color:var(--accent); }
@@ -425,13 +426,14 @@
     #title-card { position:absolute; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(0,0,0,.78); color:#fff; text-align:center; font-family:'BookkMyungjo', serif; opacity:1; transition:opacity .6s ease; cursor:pointer; }
     #title-card.is-visible { display:flex; }
     #title-card.is-leaving { opacity:0; pointer-events:none; }
+    #standing-container { transition:transform .2s ease, opacity .6s ease; }
     .is-title-showing #dialogue-box, .is-title-showing #standing-container { opacity:0; visibility:hidden; transition:none; }
     #title-rule { font-size:24px; letter-spacing:.32em; }
     #title-main { width:80%; margin-top:8px; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
     #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
     #title-card [data-empty="true"] { display:none; }
-    #title-text { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; margin-top:40px; }
-    #title-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:none; }
+    #title-text { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; margin-top:20px; }
+    #title-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:none; transform-origin:center center; }
     #title-card.is-image-mode #title-image { display:block; }
     #title-card.is-image-mode #title-text { display:none; }
     #log-view { font-family:var(--dialogue-font-family, 'Noto Sans KR', sans-serif); letter-spacing:var(--dialogue-letter-spacing, normal); display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
@@ -514,11 +516,24 @@
             <label class="standing-mini-control title-spacing-control"><span>자간</span><input id="title-spacing" type="range" min="-0.1" max="0.5" step="0.01" value="0"></label>
             <label class="title-field"><span class="setting-label">하단 문구</span><textarea id="title-credit-input" rows="2" placeholder="예: written by ..."></textarea></label>
             </div>
+            <div id="title-image-fields">
             <label id="title-image-field" class="bgm-file-row" title="타이틀 이미지 업로드" aria-label="타이틀 이미지 업로드">
               <span class="bgm-upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg></span>
               <span id="title-image-name" class="bgm-file-name">선택된 파일 없음</span>
               <input type="file" id="title-image-upload" accept="image/*">
             </label>
+            <div class="bg-base-adjust">
+              <div class="bg-base-location-inputs">
+                <label class="bg-mini-control"><span>X</span><input id="title-img-x" type="range" min="0" max="100" value="50"></label>
+                <label class="bg-mini-control"><span>Y</span><input id="title-img-y" type="range" min="0" max="100" value="50"></label>
+                <button type="button" id="title-img-position-reset" class="bg-reset-icon" aria-label="타이틀 이미지 위치 초기화" title="위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+              </div>
+              <div class="bg-base-size-row">
+                <label class="bg-mini-control bg-size-control"><span>S</span><input id="title-img-zoom" type="range" min="-50" max="50" value="0"></label>
+                <button type="button" id="title-img-size-reset" class="bg-reset-icon" aria-label="타이틀 이미지 크기 초기화" title="크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+              </div>
+            </div>
+            </div>
           </div>
         </section>
         <section class="settings-group">
@@ -627,7 +642,7 @@
     const baseBackgroundSettings = { x: 50, y: 50, zoom: 0 };
     let highResImageMap = {}; 
     let currentIndex = 0;
-    const titleSettings = { enabled: false, mode: 'text', image: '', rule: '', title: '', credit: '', spacing: 0 };
+    const titleSettings = { enabled: false, mode: 'text', image: '', imageX: 50, imageY: 50, imageZoom: 0, rule: '', title: '', credit: '', spacing: 0 };
     let titleHideTimer = null;
     function applyTitleText(root, settings) {
       [['title-rule', settings.rule], ['title-main', settings.title], ['title-credit', settings.credit]].forEach(([id, text]) => {
@@ -638,6 +653,7 @@
       root.classList.toggle('is-image-mode', isImage);
       const image = root.querySelector('#title-image');
       if (isImage && settings.image) image.src = settings.image; else image.removeAttribute('src');
+      image.style.transform = `translate(${settings.imageX - 50}%, ${settings.imageY - 50}%) scale(${1 + settings.imageZoom / 100})`;
     }
     function showPreviewTitle() {
       const card = document.getElementById('title-card');
@@ -664,8 +680,10 @@
       clearTimeout(titleHideTimer);
       titleHideTimer = setTimeout(() => {
         card.classList.remove('is-visible', 'is-leaving');
-        document.getElementById('preview-screen').classList.remove('is-title-showing');
+        const screen = document.getElementById('preview-screen');
         if (storyData.length) { clearInterval(typeInterval); clearTimeout(autoPlayTimeout); isTyping = false; currentIndex = 0; renderPreview(currentIndex); }
+        void screen.offsetWidth;
+        screen.classList.remove('is-title-showing');
       }, 600);
     }
     let isTyping = false;
@@ -1433,6 +1451,18 @@
       };
       reader.readAsDataURL(file);
     });
+    [['title-img-x', 'imageX'], ['title-img-y', 'imageY'], ['title-img-zoom', 'imageZoom']].forEach(([id, key]) => {
+      document.getElementById(id).addEventListener('input', e => { titleSettings[key] = Number(e.target.value); showPreviewTitle(); });
+    });
+    document.getElementById('title-img-position-reset').addEventListener('click', () => {
+      titleSettings.imageX = 50; titleSettings.imageY = 50;
+      document.getElementById('title-img-x').value = 50; document.getElementById('title-img-y').value = 50;
+      showPreviewTitle();
+    });
+    document.getElementById('title-img-size-reset').addEventListener('click', () => {
+      titleSettings.imageZoom = 0; document.getElementById('title-img-zoom').value = 0;
+      showPreviewTitle();
+    });
     document.getElementById('title-spacing').addEventListener('input', e => {
       titleSettings.spacing = Number(e.target.value);
       showPreviewTitle();
@@ -1566,13 +1596,14 @@
     #title-card { position:absolute; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(0,0,0,.78); color:#fff; text-align:center; font-family:'BookkMyungjo', serif; opacity:1; transition:opacity .6s ease; cursor:pointer; }
     #title-card.is-visible { display:flex; }
     #title-card.is-leaving { opacity:0; pointer-events:none; }
+    #standing-container { transition:transform .2s ease, opacity .6s ease; }
     .is-title-showing #dialogue-box, .is-title-showing #standing-container { opacity:0; visibility:hidden; transition:none; }
     #title-rule { font-size:24px; letter-spacing:.32em; }
     #title-main { width:80%; margin-top:8px; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
     #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
     #title-card [data-empty="true"] { display:none; }
-    #title-text { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; margin-top:40px; }
-    #title-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:none; }
+    #title-text { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; margin-top:20px; }
+    #title-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:none; transform-origin:center center; }
     #title-card.is-image-mode #title-image { display:block; }
     #title-card.is-image-mode #title-text { display:none; }
     #log-view { font-family: ${dialogueFontFamilyValue}; letter-spacing: ${dialogueLetterSpacingValue}; display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
@@ -1946,7 +1977,7 @@
         if (card.classList.contains('is-visible')) {
           isLeavingTitle = true;
           card.classList.add('is-leaving');
-          setTimeout(function() { card.classList.remove('is-visible'); document.getElementById('viewer-screen').classList.remove('is-title-showing'); isLeavingTitle = false; currentIndex = 0; renderScene(currentIndex); }, 600);
+          setTimeout(function() { card.classList.remove('is-visible'); isLeavingTitle = false; currentIndex = 0; renderScene(currentIndex); const screen = document.getElementById('viewer-screen'); void screen.offsetWidth; screen.classList.remove('is-title-showing'); }, 600);
         } else { currentIndex = 0; renderScene(currentIndex); }
         return;
       }
@@ -1985,7 +2016,7 @@
         const el = document.getElementById(pair[0]); el.textContent = pair[1]; el.dataset.empty = String(!String(pair[1]).trim());
       });
       document.getElementById('title-main').style.letterSpacing = titleSettings.spacing + 'em';
-      if (titleSettings.mode === 'image') { card.classList.add('is-image-mode'); if (titleSettings.image) document.getElementById('title-image').src = titleSettings.image; }
+      if (titleSettings.mode === 'image') { card.classList.add('is-image-mode'); const titleImage = document.getElementById('title-image'); if (titleSettings.image) titleImage.src = titleSettings.image; titleImage.style.transform = 'translate(' + (titleSettings.imageX - 50) + '%, ' + (titleSettings.imageY - 50) + '%) scale(' + (1 + titleSettings.imageZoom / 100) + ')'; }
       card.classList.add('is-visible');
       document.getElementById('viewer-screen').classList.add('is-title-showing');
     } else if (storyData.length) { currentIndex = 0; renderScene(currentIndex); }
