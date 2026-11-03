@@ -147,7 +147,8 @@
     .setting-label { color:var(--text-muted); font-size:12px; white-space:nowrap; }
     .setting-hint { color:var(--text-muted); font-size:11px; line-height:1.5; }
     #character-position-controls { display:flex; flex-direction:column; gap:8px; }
-    .sidebar-tabs { display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:3px; margin-bottom:6px; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); flex-shrink:0; }
+    .sidebar-tabs-wrap { position:sticky; top:-20px; z-index:30; margin-top:-20px; padding:20px 0 6px; background:var(--bg-panel); flex-shrink:0; }
+    .sidebar-tabs { display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:3px; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); flex-shrink:0; }
     .sidebar-tab { padding:7px 0; border:0; border-radius:6px; color:var(--text-muted); background:transparent; font-size:13px; font-weight:600; cursor:pointer; transition:background-color .15s, color .15s; }
     .sidebar-tab:hover { color:var(--text-main); }
     .sidebar-tab.is-active { color:var(--text-main); background:var(--bg-panel); }
@@ -157,8 +158,8 @@
     .log-editor-link { padding:0; border:0; color:var(--text-main); background:transparent; font-size:12px; text-decoration:underline; cursor:pointer; }
     .log-editor-list { display:flex; flex-direction:column; gap:2px; min-width:0; }
     .log-row { display:grid; grid-template-columns:minmax(0,1fr) 28px; align-items:center; gap:4px; border-radius:6px; }
-    .log-row:hover { background:var(--bg-main); }
-    .log-row.is-current { background:var(--bg-main); box-shadow:inset 2px 0 0 var(--accent); }
+    .log-row:hover { background:color-mix(in srgb, var(--bg-main) 45%, transparent); }
+    .log-row.is-current { background:var(--bg-main); }
     .log-row-main { display:grid; grid-template-columns:30px minmax(0,1fr); gap:6px; min-width:0; padding:6px 4px 6px 6px; border:0; color:var(--text-main); background:transparent; text-align:left; cursor:pointer; }
     .log-row-index { color:var(--text-muted); font-size:10px; font-variant-numeric:tabular-nums; line-height:1.6; }
     .log-row-body { min-width:0; font-size:12px; line-height:1.45; }
@@ -478,9 +479,11 @@
 
   <div class="app-container">
     <div class="sidebar">
+      <div class="sidebar-tabs-wrap">
       <div class="sidebar-tabs" role="tablist" aria-label="편집 패널">
         <button type="button" class="sidebar-tab is-active" role="tab" id="tab-btn-settings" aria-controls="tab-settings" aria-selected="true" data-tab="settings">설정</button>
         <button type="button" class="sidebar-tab" role="tab" id="tab-btn-log" aria-controls="tab-log" aria-selected="false" data-tab="log">로그 편집</button>
+      </div>
       </div>
       <div id="tab-settings" class="sidebar-tab-panel" role="tabpanel" aria-labelledby="tab-btn-settings">
       <div class="sidebar-title">기본 리소스</div>
