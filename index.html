@@ -33,7 +33,7 @@
       --text-muted: #a1a1aa;
       --border: #3f3f46;
       --success: #10b981;
-      --space-ui: 14px;
+      --space-ui: 16px;
     }
 
     body {
@@ -41,8 +41,10 @@
       padding: 0;
       background-color: var(--bg-main);
       color: var(--text-main);
-      font-family: 'Noto Sans KR', sans-serif;
+      font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+      letter-spacing: -0.01em;
       line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
       height: 100vh;
       display: flex;
       flex-direction: column;
@@ -62,7 +64,10 @@
       justify-content: space-between;
       z-index: 50;
     }
-    .app-header h1 { margin: 0; font-size: 19px; color: var(--text-main); letter-spacing: -.3px; }
+    .app-header h1 { margin: 0; font-size: 18px; font-weight: 700; color: var(--text-main); letter-spacing: -.02em; }
+    button, input, select, textarea { font-family: inherit; letter-spacing: inherit; }
+    button:focus-visible, select:focus-visible, input:focus-visible, label:focus-within > input[type="checkbox"] { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .upload-btn:focus-within, .bg-upload-tile:focus-within { border-color: var(--accent); }
 
     /* 메인 레이아웃 */
     .app-container {
@@ -87,9 +92,14 @@
       border: 1px solid var(--border);
       overflow-y: auto;
     }
-    .sidebar::-webkit-scrollbar { width: 8px; }
-    .sidebar::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
-    .sidebar-title { font-size: 13px; color: var(--text-main); margin-bottom: 5px; font-weight: 650; }
+    .sidebar::-webkit-scrollbar, .name-check-list::-webkit-scrollbar, .character-position-list::-webkit-scrollbar { width: 6px; }
+    .sidebar::-webkit-scrollbar-track, .name-check-list::-webkit-scrollbar-track, .character-position-list::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb, .name-check-list::-webkit-scrollbar-thumb, .character-position-list::-webkit-scrollbar-thumb { background: #52525b; border-radius: 3px; }
+    .sidebar-title { font-size: 13px; color: var(--text-main); margin-bottom: 4px; font-weight: 600; letter-spacing: -.01em; }
+    .sidebar select { padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); background-color: var(--bg-main); font-size: 12px; cursor: pointer; transition: border-color .15s; }
+    .sidebar select:hover { border-color: #71717a; }
+    .resource-step-title { color:var(--text-main); font-size:13px; font-weight:400; line-height:normal; }
+    .upload-btn .resource-step-title, .resource-step-box > .resource-step-title, .bgm-heading-row > .resource-step-title { font-family:inherit; font-size:13px; font-weight:400; line-height:1.2; }
 
     .upload-btn {
       display: flex; justify-content: space-between; align-items: center; padding: 12px 15px;
@@ -99,13 +109,13 @@
     .upload-btn:hover { border-color: #71717a; background-color: #202023; }
     .upload-btn input { display: none; }
     
-    .status-icon { width: 10px; height: 10px; border-radius: 50%; background-color: var(--border); }
+    .status-icon { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background-color: #52525b; transition: background-color .2s, box-shadow .2s; }
     .status-icon.done { background-color: var(--success); box-shadow: 0 0 8px var(--success); }
     .divider { height: 1px; background-color: var(--border); margin: 5px 0; flex-shrink: 0; }
 
     .download-btn {
       margin-top: auto; padding: 13px 15px; background-color: var(--accent); color: #18181b;
-      font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; flex-shrink: 0;
+      font-size: 15px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; flex-shrink: 0;
       transition: 0.2s;
     }
     .download-btn:hover:not(:disabled) { background-color: var(--accent-hover); }
@@ -121,10 +131,21 @@
       border: 1px solid var(--border); 
       border-radius: 6px;
     }
-    #custom-ui-panel { display:flex; flex-direction:column; gap:var(--space-ui); margin-top:6px; line-height:1.45; }
+    .color-setting-box select { padding-top: 5px; padding-bottom: 5px; }
+    #custom-ui-panel { display:flex; flex-direction:column; gap:var(--space-ui); margin-top:8px; padding:16px 0; border-top:1px solid var(--border); line-height:1.45; font-size:12px; }
     #custom-ui-panel > * { margin-top:0 !important; margin-bottom:0 !important; }
     #custom-ui-panel .sidebar-title { line-height:1.45; }
     #custom-ui-panel .standing-lock-row { margin:0; }
+    .settings-group { display:flex; flex-direction:column; gap:10px; min-width:0; }
+    .settings-group + .settings-group { padding-top:var(--space-ui); border-top:1px solid var(--border); }
+    .settings-group > .sidebar-title { margin:0; }
+    .setting-row { display:grid; grid-template-columns:64px minmax(0,1fr); align-items:center; gap:8px; min-width:0; }
+    .setting-row select { width:100%; min-width:0; box-sizing:border-box; }
+    .setting-offset { grid-column:2; }
+    .setting-pair { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6px; min-width:0; }
+    .setting-field { display:flex; flex-direction:column; gap:6px; min-width:0; }
+    .setting-label { color:var(--text-muted); font-size:12px; white-space:nowrap; }
+    .setting-hint { color:var(--text-muted); font-size:11px; line-height:1.5; }
     #character-position-controls { display:flex; flex-direction:column; gap:8px; }
     #character-position-list { margin-top:0; }
 
@@ -258,12 +279,15 @@
     .name-check-row input { width:16px; height:16px; accent-color:var(--accent); flex:0 0 auto; }
     .standing-lock-row { display:flex; align-items:center; justify-content:space-between; margin-top:10px; padding:8px 10px; border:1px solid var(--border); border-radius:6px; background:var(--bg-main); font-size:12px; }
     .standing-lock-row input { width:16px; height:16px; accent-color:var(--accent); }
+    .standing-lock-row.plain { padding:0 2px; border:none; background:none; }
+    .canvas-size-warning { display:none; margin:0; color:#e5534b; font-size:11px; line-height:1.4; }
     .character-position-list { display:flex; flex-direction:column; gap:4px; max-height:150px; overflow-y:auto; margin-top:7px; }
-    .character-position-row { display:grid; grid-template-columns:minmax(0,1fr) 72px; align-items:center; gap:6px; padding:5px 7px; border:1px solid var(--border); border-radius:5px; background:var(--bg-main); font-size:11px; }
+    .character-position-row { display:grid; grid-template-columns:44px minmax(0,160px); justify-content:space-between; align-items:center; gap:6px; padding:0 2px; font-size:11px; }
     .character-position-row span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .character-position-row select { width:100%; min-width:0; box-sizing:border-box; font-size:11px; }
+    .character-position-row select { width:100%; min-width:0; box-sizing:border-box; padding:4px 6px; font-size:11px; }
 
-    .background-settings-box { display:flex; flex-direction:column; gap:9px; padding:10px; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); min-width:0; }
+    .background-settings-box { display:flex; flex-direction:column; gap:9px; padding:12px 15px; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); min-width:0; }
+    .background-settings-box.resource-step-box { padding:12px 15px; }
     .bg-base-row { display:grid; grid-template-columns:52px minmax(0,1fr); gap:10px; align-items:center; min-width:0; }
     .bg-upload-tile { width:52px; height:52px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); color:var(--text-main); cursor:pointer; box-sizing:border-box; }
     .bg-upload-tile input { display:none; }
@@ -271,50 +295,69 @@
     .bg-upload-tile img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none; }
     .bg-upload-tile.has-image img { display:block; }
     .bg-upload-tile.has-image svg { display:none; }
-    .bg-base-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
     .bg-range-card { position:relative; display:grid; grid-template-columns:52px minmax(0,1fr); gap:9px; padding:9px; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); min-width:0; box-sizing:border-box; }
-    .bg-range-controls { display:flex; flex-direction:column; gap:6px; min-width:0; padding-right:22px; }
+    .bg-range-controls { display:flex; flex-direction:column; gap:6px; min-width:0; }
+    .bg-range-controls > strong { padding-right:24px; }
+    .bg-range-card > .bg-range-settings { grid-column:1/-1; }
     .remove-bg { position:absolute; top:5px; right:5px; width:22px; height:22px; display:flex; align-items:center; justify-content:center; padding:0; border:0; border-radius:5px; color:var(--text-muted); background:transparent; cursor:pointer; }
     .remove-bg:hover { color:var(--text-main); background:var(--bg-panel); }
-    .bg-range-pair { display:grid; grid-template-columns:1fr 1fr; gap:5px; min-width:0; }
-    .bg-range-pair select { width:100%; min-width:0; max-width:100%; box-sizing:border-box; font-size:10px; }
-    .bg-range-settings { display:flex; flex-direction:column; gap:8px; padding:8px 6px 0; border-top:1px solid var(--border); font-size:10px; }
+    .bg-range-pair { display:grid; grid-template-columns:1fr 1fr; gap:6px; min-width:0; }
+    .bg-range-pair label { display:flex; flex-direction:column; gap:3px; min-width:0; color:var(--text-muted); font-size:11px !important; }
+    .bg-range-pair select { width:100%; min-width:0; max-width:100%; box-sizing:border-box; padding:4px 6px; padding-right:20px !important; background-position:right 5px center !important; font-size:11px; }
+    .bg-range-controls > strong { font-size:12px !important; font-weight:600; }
+    .bg-range-settings { display:flex; flex-direction:column; gap:4px; padding:6px 2px 0; font-size:11px; }
     .bg-range-settings input, .bg-base-adjust input { width:100%; min-width:0; accent-color:var(--accent); }
-    .bg-base-adjust { display:flex; flex-direction:column; gap:8px; padding:8px 6px; font-size:10px; }
-    .bg-base-control-group, .bg-range-control-group { display:flex; flex-direction:column; gap:4px; min-width:0; }
-    .bg-base-control-group + .bg-base-control-group, .bg-range-control-group + .bg-range-control-group { padding-top:6px; border-top:1px solid var(--border); }
-    .bg-control-heading { display:flex; align-items:center; justify-content:space-between; min-height:22px; color:var(--text-muted); font-size:10px; }
-    .bg-base-location-inputs, .bg-range-location-inputs { display:grid; grid-template-columns:1fr; gap:4px; min-width:0; }
+    .bg-base-adjust { display:flex; flex-direction:column; gap:2px; min-width:0; padding:0; font-size:11px; }
+    .bg-base-control-group, .bg-range-control-group { display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .bg-control-heading { display:flex; align-items:center; justify-content:space-between; min-height:20px; color:var(--text-main); font-size:12px; }
+    .bg-base-location-inputs, .bg-range-location-inputs { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
+    .bg-base-size-row, .bg-range-size-row { display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
     .bg-reset-icon { width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; padding:0; border:0; border-radius:0; color:var(--text-muted); background:transparent; cursor:pointer; }
     .bg-reset-icon svg { width:13px; height:13px; }
     .bg-reset-icon:hover { color:var(--text-main); background:transparent; }
     .scene-bg-notice { margin:0; color:#dc2626; font-size:11px; line-height:1.4; }
-    .bg-mini-control { min-width:0; display:grid; grid-template-columns:12px minmax(0,1fr) 34px; align-items:center; gap:7px; padding:5px 7px; box-sizing:border-box; }
-    .bg-mini-control.bg-size-control { grid-template-columns:minmax(0,1fr) 34px; }
-    .bg-mini-control.bg-size-control > span:first-child { grid-column:1/-1; }
+    .bg-mini-control { min-width:0; display:grid; grid-template-columns:10px minmax(0,1fr); align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; }
+    .bg-mini-control.bg-size-control { grid-template-columns:10px minmax(0,1fr); }
     .bg-mini-control input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
-    .bg-mini-control .range-value { flex:none; width:34px; }
+    .bg-mini-control .range-value { display:none; }
     .range-control-row { display:flex; align-items:center; gap:6px; width:100%; min-width:0; box-sizing:border-box; }
     .range-control-row input[type="range"] { flex:1 1 0; min-width:0; width:0 !important; max-width:100%; box-sizing:border-box; accent-color:var(--accent); }
     .range-value { display:inline-block; flex:0 0 52px; width:52px; min-width:0; box-sizing:border-box; overflow:visible; text-align:right; white-space:nowrap; color:var(--text-muted); font-size:11px; font-variant-numeric:tabular-nums; }
-    .standing-adjust-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; margin-top:10px; min-width:0; }
-    .standing-adjust-grid > label { min-width:0; box-sizing:border-box; }
+    .standing-global-controls { display:flex; flex-direction:column; gap:4px; min-width:0; }
+    .standing-global-controls > select { width:100%; min-width:0; box-sizing:border-box; margin-bottom:2px; }
+    .standing-lock-row { cursor:pointer; }
+    .bg-base-location-inputs > label + label, .bg-range-location-inputs > label + label, .standing-xy-inputs > label + label { margin-left:10px; }
+    .standing-xy-inputs { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
+    .standing-size-row { display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
+    .standing-mini-control { min-width:0; display:grid; grid-template-columns:10px minmax(0,1fr) 34px; align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; font-size:11px; }
+    .standing-mini-control input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
+    .standing-mini-control .range-value { flex:none; width:34px; font-size:10px; }
+    .standing-gap-control { margin-top:4px; min-width:0; }
+    .standing-gap-row { display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
+    .standing-gap-slider { min-width:0; display:grid; grid-template-columns:auto minmax(0,1fr) 34px; align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; font-size:11px; }
+    .standing-gap-slider input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
+    .standing-gap-slider .range-value { flex:none; width:34px; font-size:10px; }
+    .bgm-icon-btn { width:18px; height:16px; display:inline-flex; align-items:center; justify-content:center; padding:0; border:0; outline:0; box-shadow:none; background:transparent; color:var(--text-main); cursor:pointer; }
+    .bgm-icon-btn svg { width:14px; height:14px; fill:currentColor; stroke:currentColor; }
+    .bgm-volume-icon { display:block; width:16px; height:16px; color:var(--text-muted); }
     .font-setting-row { display:grid; grid-template-columns:40px minmax(0,1fr) minmax(0,1fr); align-items:center; gap:6px; min-width:0; font-size:12px; }
-    .font-setting-row select { width:100%; min-width:0; box-sizing:border-box; padding:6px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-main); font-size:12px; }
+    .canvas-size-fields { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px; min-width:0; }
+    .canvas-size-field { display:flex; align-items:center; gap:5px; min-width:0; color:var(--text-muted); font-size:11px; }
+    .canvas-size-field > span { flex:0 0 auto; }
+    .canvas-size-field input { flex:1 1 0; width:0; min-width:0; box-sizing:border-box; padding:6px 8px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-main); font-size:12px; font-variant-numeric:tabular-nums; }
+    .canvas-size-field small { flex:0 0 auto; color:var(--text-muted); font-size:10px; }
+    .font-setting-row select { width:100%; min-width:0; box-sizing:border-box; padding:7px 10px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background-color:var(--bg-main); font-size:12px; }
     select { appearance:none; -webkit-appearance:none; padding-right:30px !important; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='m3 4.5 3 3 3-3' stroke='%23a1a1aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important; background-repeat:no-repeat !important; background-position:right 10px center !important; background-size:12px 12px !important; }
-    .bgm-settings { gap:8px; }
-    .bgm-upload-row { display:flex; align-items:center; gap:8px; min-width:0; }
-    .bgm-upload-btn { display:flex; align-items:center; justify-content:center; flex:0 0 auto; padding:7px 10px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-panel); font-size:11px; cursor:pointer; }
+    .bgm-settings { display:flex; flex-direction:column; gap:10px; min-width:0; }
+    .bgm-file-row { display:grid; grid-template-columns:24px minmax(0,1fr); align-items:center; gap:7px; min-width:0; }
+    .bgm-volume-row { display:grid; grid-template-columns:24px 16px minmax(0,1fr); align-items:center; gap:7px; min-width:0; }
+    .bgm-upload-btn { width:24px; height:24px; display:flex; align-items:center; justify-content:center; border:0; border-radius:0; background:transparent; color:var(--text-main); cursor:pointer; }
+    .bgm-upload-btn svg { width:18px; height:18px; }
     .bgm-upload-btn input { display:none; }
     .bgm-file-name { min-width:0; overflow:hidden; color:var(--text-muted); font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
-    .bgm-action-btn { flex:0 0 auto; padding:6px 9px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-panel); font-size:11px; cursor:pointer; }
-    .bgm-control-row { display:flex; align-items:center; gap:8px; font-size:11px; }
-    .bgm-control-row input[type="range"] { flex:1; min-width:0; accent-color:var(--accent); }
-    .bgm-volume-value { flex:0 0 34px; text-align:right; color:var(--text-muted); font-variant-numeric:tabular-nums; }
-    .bgm-status { min-height:14px; margin:0; color:var(--text-muted); font-size:10px; line-height:1.4; }
+    .bgm-volume-slider { display:block; width:100%; min-width:0; height:18px; margin:0; accent-color:var(--accent); }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     .bgm-audio { display:none; }
-    .standing-adjust-grid .range-control-row { gap:3px; }
-    .standing-adjust-grid .range-value { flex-basis:34px; width:34px; font-size:9px; }
 
     /* 하단 대화창 */
     #dialogue-box {
@@ -378,38 +421,39 @@
 
   <div class="app-container">
     <div class="sidebar">
-      <div class="sidebar-title">기본 리소스 (필수)</div>
+      <div class="sidebar-title">기본 리소스</div>
       <label class="upload-btn" id="lbl-html">
-        <span>1. HTML 로그 업로드</span>
+        <span class="resource-step-title">1. HTML 로그 업로드</span>
         <div class="status-icon" id="icon-html"></div>
         <input type="file" id="html-upload" accept=".html">
       </label>
       <label class="upload-btn" id="lbl-json">
-        <span>2. JSON 파일 업로드</span>
+        <span class="resource-step-title">2. JSON 파일 업로드</span>
         <div class="status-icon" id="icon-json"></div>
         <input type="file" id="json-upload" accept=".json">
       </label>
-      <section class="background-settings-box">
-        <div class="sidebar-title" style="margin:0;">3. 배경 이미지 설정</div>
+      <section class="background-settings-box resource-step-box">
+        <div class="sidebar-title resource-step-title" style="margin:0;">3. 배경 이미지 설정</div>
         <div class="bg-base-row">
           <label class="bg-upload-tile" id="lbl-bg" title="배경 이미지 업로드" aria-label="배경 이미지 업로드">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg>
             <img id="bg-upload-thumb" alt="배경 이미지 미리보기">
             <input type="file" id="bg-upload" accept="image/*">
           </label>
-          <div class="bg-base-name" id="bg-base-name">기본 배경 업로드</div>
-        </div>
-        <div class="bg-base-adjust">
-          <div class="bg-base-control-group">
-            <div class="bg-control-heading"><span>위치 조절</span><button type="button" id="base-bg-position-reset" class="bg-reset-icon" aria-label="위치 초기화" title="위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div>
-            <div class="bg-base-location-inputs">
-              <label class="bg-mini-control">X <input id="base-bg-x" type="range" min="0" max="100" value="50"><small class="range-value" id="base-bg-x-value">50%</small></label>
-              <label class="bg-mini-control">Y <input id="base-bg-y" type="range" min="0" max="100" value="50"><small class="range-value" id="base-bg-y-value">50%</small></label>
+          <div class="bg-base-adjust">
+            <div class="bg-base-control-group">
+              <div class="bg-base-location-inputs">
+                <label class="bg-mini-control"><span>X</span><input id="base-bg-x" type="range" min="0" max="100" value="50"><small class="range-value" id="base-bg-x-value">50%</small></label>
+                <label class="bg-mini-control"><span>Y</span><input id="base-bg-y" type="range" min="0" max="100" value="50"><small class="range-value" id="base-bg-y-value">50%</small></label>
+                <button type="button" id="base-bg-position-reset" class="bg-reset-icon" aria-label="위치 초기화" title="위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+              </div>
             </div>
-          </div>
-          <div class="bg-base-control-group">
-            <div class="bg-control-heading"><span>크기 조절 (0 = 가로 꽉 채움)</span><button type="button" id="base-bg-size-reset" class="bg-reset-icon" aria-label="크기 초기화" title="크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div>
-            <label class="bg-mini-control bg-size-control"><input id="base-bg-zoom" type="range" min="-50" max="50" value="0"><small class="range-value" id="base-bg-zoom-value">0%</small></label>
+            <div class="bg-base-control-group">
+              <div class="bg-base-size-row">
+                <label class="bg-mini-control bg-size-control"><span>S</span><input id="base-bg-zoom" type="range" min="-50" max="50" value="0"><small class="range-value" id="base-bg-zoom-value">0%</small></label>
+                <button type="button" id="base-bg-size-reset" class="bg-reset-icon" aria-label="크기 초기화" title="크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+              </div>
+            </div>
           </div>
         </div>
         <div id="scene-bg-list" style="display:flex; flex-direction:column; gap:8px; min-width:0;">
@@ -417,66 +461,84 @@
         </div>
         <p id="scene-bg-notice" class="scene-bg-notice" role="status" style="display:none;"></p>
       </section>
-      <section class="background-settings-box bgm-settings">
-        <div class="sidebar-title" style="margin:0;">배경 음악</div>
-        <div class="bgm-upload-row">
-          <label class="bgm-upload-btn">오디오 업로드<input type="file" id="bgm-upload" accept="audio/*"></label>
-          <span id="bgm-file-name" class="bgm-file-name">선택된 파일 없음</span>
-        </div>
-        <div class="bgm-control-row">
-          <button type="button" id="bgm-play-toggle" class="bgm-action-btn">재생</button>
-          <label for="bgm-volume">음량</label>
-          <input id="bgm-volume" type="range" min="0" max="100" value="35">
-          <output id="bgm-volume-value" class="bgm-volume-value">35%</output>
-        </div>
-        <audio id="bgm-audio" class="bgm-audio" loop preload="metadata"></audio>
-        <p id="bgm-status" class="bgm-status" role="status">오디오 파일을 업로드한 뒤 재생을 누르세요. 음악은 반복됩니다.</p>
-      </section>
       <div id="custom-ui-panel" style="display: none;">
-        <div class="sidebar-title">화면 설정</div>
-
-        <label style="display:flex; flex-direction:column; gap:6px; font-size:12px;">화면 크기
-          <select id="canvas-preset" style="padding:7px; border-radius:6px; background:var(--bg-main); color:var(--text-main); border:1px solid var(--border);">
-            <option value="1200x900">4:3 (기본값 1200 × 900)</option>
-            <option value="1600x900">16:9 (1600 × 900)</option>
-          </select>
-        </label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <label style="font-size:11px; color:var(--text-muted);">가로 (px)<input id="canvas-width" type="number" min="320" max="6000" step="10" value="1200" style="display:block; box-sizing:border-box; width:100%; margin-top:4px; padding:6px; border-radius:6px; background:var(--bg-main); color:var(--text-main); border:1px solid var(--border);"></label>
-          <label style="font-size:11px; color:var(--text-muted);">세로 (px)<input id="canvas-height" type="number" min="240" max="6000" step="10" value="900" style="display:block; box-sizing:border-box; width:100%; margin-top:4px; padding:6px; border-radius:6px; background:var(--bg-main); color:var(--text-main); border:1px solid var(--border);"></label>
-        </div>
-        
-        <label class="color-setting-box"><span style="font-size:12px;">대화창 모드</span><select id="theme-select"><option value="dark">블랙 모드</option><option value="light">화이트 모드</option></select></label>
-        <div class="font-setting-row"><span>폰트</span><select id="dialogue-font-select"><option value="gothic">고딕</option><option value="myeongjo">명조</option></select><select id="dialogue-font-size" aria-label="폰트 크기"><option value="14">14 px</option><option value="16">16 px</option><option value="18">18 px</option><option value="20" selected>20 px</option><option value="22">22 px</option><option value="24">24 px</option><option value="26">26 px</option></select></div>
-        <label style="display:flex; flex-direction:column; gap:6px; margin-top:10px; font-size:12px;">나레이션 저널
-          <div id="narration-name-list" class="name-check-list" role="group" aria-label="나레이션 캐릭터"></div>
-        </label>
-        <div class="standing-adjust-grid">
-          <div class="global-standing-position">
-            <div class="bg-control-heading"><span>스탠딩 위치 조절</span><button type="button" id="standing-position-reset" class="bg-reset-icon" aria-label="스탠딩 위치 초기화" title="스탠딩 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div>
-            <label style="display:flex; flex-direction:column; gap:6px; font-size:12px;">X <span class="range-control-row"><input id="standing-x" type="range" min="-300" max="300" step="5" value="0"><small class="range-value" id="standing-x-value">0 px</small></span></label>
-            <label style="display:flex; flex-direction:column; gap:6px; font-size:12px;">Y <span class="range-control-row"><input id="standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="standing-y-value">0 px</small></span></label>
+        <section class="settings-group bgm-settings">
+          <div class="sidebar-title">BGM</div>
+          <div class="bgm-file-row">
+            <label class="bgm-upload-btn" title="배경 음악 업로드" aria-label="배경 음악 업로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg><input type="file" id="bgm-upload" accept="audio/*"></label>
+            <span id="bgm-file-name" class="bgm-file-name">선택된 파일 없음</span>
           </div>
-          <label style="display:flex; flex-direction:column; gap:6px; font-size:12px;">스탠딩 간격 <span class="range-control-row"><input id="standing-gap" type="range" min="-50" max="50" step="1" value="0"><small class="range-value" id="standing-gap-value">0%</small></span></label>
+          <div class="bgm-volume-row">
+            <button type="button" id="bgm-play-toggle" class="bgm-icon-btn" aria-label="재생" title="재생"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg></button>
+            <svg class="bgm-volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M16 9a5 5 0 0 1 0 6m2.5-8.5a8.5 8.5 0 0 1 0 11"/></svg>
+            <input id="bgm-volume" class="bgm-volume-slider" type="range" min="0" max="100" value="35" aria-label="배경 음악 음량" title="음량">
+          </div>
+          <audio id="bgm-audio" class="bgm-audio" loop preload="metadata"></audio>
+          <p id="bgm-status" class="sr-only" role="status" aria-live="polite"></p>
+        </section>
+        <section class="settings-group">
+          <div class="sidebar-title">화면 설정</div>
+          <label class="setting-row"><span class="setting-label">화면 크기</span>
+            <select id="canvas-preset">
+              <option value="1200x900">4:3 (1200 × 900)</option>
+              <option value="1600x900">16:9 (1600 × 900)</option>
+            </select>
+          </label>
+          <div class="setting-row">
+            <div class="canvas-size-fields setting-offset">
+              <label class="canvas-size-field"><span>가로</span><input id="canvas-width" type="number" min="400" max="3000" step="1" value="1200" aria-label="화면 가로 크기"><small>px</small></label>
+              <label class="canvas-size-field"><span>세로</span><input id="canvas-height" type="number" min="400" max="3000" step="1" value="900" aria-label="화면 세로 크기"><small>px</small></label>
+            </div>
+            <p id="canvas-size-warning" class="canvas-size-warning setting-offset" role="alert"></p>
+          </div>
+          <label class="setting-row"><span class="setting-label">화면 분할</span>
+            <select id="standing-division"><option value="2">2분할 (최대 2명)</option><option value="4">4분할 (최대 4명)</option></select>
+          </label>
+          <label class="standing-lock-row plain"><span>캐릭터 위치 고정</span><input id="standing-position-lock" type="checkbox"></label>
+          <div id="character-position-controls" style="display:none;">
+            <div id="character-position-list" class="character-position-list"></div>
+          </div>
+        </section>
+
+        <section class="settings-group">
+          <div class="sidebar-title">대화창 설정</div>
+          <label class="setting-row"><span class="setting-label">모드</span><select id="theme-select"><option value="dark">블랙 모드</option><option value="light">화이트 모드</option></select></label>
+          <div class="setting-row"><span class="setting-label">폰트</span><div class="setting-pair"><select id="dialogue-font-select" aria-label="폰트 종류"><option value="gothic">고딕</option><option value="myeongjo">명조</option></select><select id="dialogue-font-size" aria-label="폰트 크기"><option value="14">14 px</option><option value="16">16 px</option><option value="18">18 px</option><option value="20" selected>20 px</option><option value="22">22 px</option><option value="24">24 px</option><option value="26">26 px</option></select></div></div>
+          <div class="setting-field"><span class="setting-label">나레이션 저널</span>
+            <div id="narration-name-list" class="name-check-list" role="group" aria-label="나레이션 캐릭터"></div>
+          </div>
+        </section>
+
+        <section class="settings-group">
+        <div class="sidebar-title">스탠딩 설정</div>
+        <div class="standing-global-controls">
+          <div class="bg-control-heading"><span>전체 조정</span></div>
+          <div class="standing-xy-inputs">
+            <label class="standing-mini-control"><span>X</span><input id="standing-x" type="range" min="-300" max="300" step="5" value="0"><small class="range-value" id="standing-x-value">0 px</small></label>
+            <label class="standing-mini-control"><span>Y</span><input id="standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="standing-y-value">0 px</small></label>
+            <button type="button" id="standing-position-reset" class="bg-reset-icon" aria-label="스탠딩 위치 초기화" title="스탠딩 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+          </div>
+          <div class="standing-size-row">
+            <label class="standing-mini-control"><span>S</span><input id="standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="standing-size-value">100%</small></label>
+            <button type="button" id="standing-size-reset" class="bg-reset-icon" aria-label="스탠딩 크기 초기화" title="스탠딩 크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+          </div>
+          <div class="standing-gap-control"><div class="standing-gap-row"><label class="standing-gap-slider"><span>간격</span><input id="standing-gap" type="range" min="-50" max="50" step="1" value="0"><small class="range-value" id="standing-gap-value">0%</small></label><button type="button" id="standing-gap-reset" class="bg-reset-icon" aria-label="간격 초기화" title="간격 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div></div>
         </div>
-        <label style="display:flex; flex-direction:column; gap:6px; margin-top:10px; font-size:12px;">스탠딩 크기 <span class="range-control-row"><input id="standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="standing-size-value">100%</small></span></label>
-        <label class="standing-lock-row"><span>스탠딩 그림자</span><input id="standing-shadow" type="checkbox" checked></label>
-        <div class="divider" style="margin:12px 0;"></div>
-        <label style="display:flex; flex-direction:column; gap:6px; font-size:12px;">캐릭터별 스탠딩 조절
-          <select id="standing-character-select" style="padding:6px; border-radius:6px; background:var(--bg-main); color:var(--text-main); border:1px solid var(--border);"></select>
-        </label>
-        <label style="display:flex; flex-direction:column; gap:6px; margin-top:8px; font-size:12px;">캐릭터 위치 Y <span class="range-control-row"><input id="character-standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-y-value">0 px</small></span></label>
-        <label style="display:flex; flex-direction:column; gap:6px; margin-top:8px; font-size:12px;">캐릭터 크기 <span class="range-control-row"><input id="character-standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="character-standing-size-value">100%</small></span></label>
-        <div class="divider" style="margin:12px 0;"></div>
-        <label style="display:flex; flex-direction:column; gap:6px; font-size:12px;">스탠딩 화면 분할
-          <select id="standing-division" style="padding:6px; border-radius:6px; background:var(--bg-main); color:var(--text-main); border:1px solid var(--border);"><option value="2">2분할 (최대 2명)</option><option value="4">4분할 (최대 4명)</option></select>
-        </label>
-        <label class="standing-lock-row"><span>캐릭터 위치 고정</span><input id="standing-position-lock" type="checkbox"></label>
-        <div id="character-position-controls" style="display:none;">
-          <small style="color:var(--text-muted);">구역을 선택한 뒤 해당 위치에 고정할 캐릭터를 지정하세요.</small>
-          <div id="character-position-list" class="character-position-list"></div>
+        <label class="standing-lock-row plain"><span>스탠딩 그림자</span><input id="standing-shadow" type="checkbox" checked></label>
+        <div class="standing-global-controls">
+          <div class="bg-control-heading"><span>캐릭터별 조정</span><button type="button" id="character-standing-reset" class="bg-reset-icon" aria-label="선택한 캐릭터 조정 초기화" title="선택한 캐릭터 조정 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div>
+          <select id="standing-character-select" aria-label="조정할 캐릭터"></select>
+          <div class="standing-xy-inputs">
+            <label class="standing-mini-control"><span>X</span><input id="character-standing-x" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-x-value">0 px</small></label>
+            <label class="standing-mini-control"><span>Y</span><input id="character-standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-y-value">0 px</small></label>
+          </div>
+          <div class="standing-size-row">
+            <label class="standing-mini-control"><span>S</span><input id="character-standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="character-standing-size-value">100%</small></label>
+          </div>
         </div>
+        </section>
       </div>
+      <!-- ㅇ -->
 
       <button class="download-btn" id="download-btn" disabled style="margin-top: auto;">웹 뷰어 다운로드 (.html)</button>
     </div>
@@ -554,7 +616,7 @@
         bgmAudio.src = bgmDataUrl;
         bgmAudio.load();
         document.getElementById('bgm-file-name').textContent = file.name;
-        document.getElementById('bgm-play-toggle').textContent = '재생';
+        setBgmToggleIcon(false);
         setBgmStatus('오디오 파일을 준비했습니다. 재생을 누르면 반복됩니다.');
       };
       reader.onerror = () => setBgmStatus('오디오 파일을 읽지 못했습니다.');
@@ -565,19 +627,40 @@
       bgmAudio.volume = bgmVolume / 100;
       bgmAudio.play().then(() => setBgmStatus('오디오를 반복 재생 중입니다.')).catch(() => setBgmStatus('재생할 수 없는 오디오 형식이거나 브라우저가 재생을 막았습니다.'));
     }
+    function setBgmToggleIcon(isPlaying) {
+      const button = document.getElementById('bgm-play-toggle');
+      button.setAttribute('aria-label', isPlaying ? '일시정지' : '재생');
+      button.title = isPlaying ? '일시정지' : '재생';
+      button.innerHTML = isPlaying ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg>';
+    }
     function toggleBgm() {
-      if (!bgmAudio.paused) { bgmAudio.pause(); document.getElementById('bgm-play-toggle').textContent = '재생'; }
+      if (!bgmAudio.paused) { bgmAudio.pause(); setBgmToggleIcon(false); }
       else startBgm();
     }
-    bgmAudio.addEventListener('play', () => { document.getElementById('bgm-play-toggle').textContent = '일시정지'; });
-    bgmAudio.addEventListener('pause', () => { document.getElementById('bgm-play-toggle').textContent = '재생'; });
+    bgmAudio.addEventListener('play', () => setBgmToggleIcon(true));
+    bgmAudio.addEventListener('pause', () => setBgmToggleIcon(false));
     bgmAudio.addEventListener('error', () => { if (bgmDataUrl) setBgmStatus('이 오디오 파일은 브라우저에서 재생할 수 없습니다.'); });
     document.getElementById('bgm-play-toggle').addEventListener('click', toggleBgm);
     document.getElementById('bgm-volume').addEventListener('input', e => {
       bgmVolume = Number(e.target.value);
-      document.getElementById('bgm-volume-value').textContent = `${bgmVolume}%`;
       bgmAudio.volume = bgmVolume / 100;
     });
+    document.addEventListener('wheel', event => {
+      if (!(event.target instanceof Element)) return;
+      const slider = event.target.closest('input[type="range"]');
+      if (!slider || slider.disabled) return;
+      event.preventDefault();
+      const min = slider.min === '' ? 0 : Number(slider.min);
+      const max = slider.max === '' ? 100 : Number(slider.max);
+      const rawStep = slider.step === '' || slider.step === 'any' ? 1 : Number(slider.step);
+      const step = Number.isFinite(rawStep) && rawStep > 0 ? rawStep : 1;
+      const direction = event.deltaY < 0 ? 1 : event.deltaY > 0 ? -1 : 0;
+      if (!direction) return;
+      const next = Math.min(max, Math.max(min, Number(slider.value) + direction * step));
+      if (next === Number(slider.value)) return;
+      slider.value = String(next);
+      slider.dispatchEvent(new Event('input', { bubbles: true }));
+    }, { passive: false });
 
     function scalePreview() {
       const wrapper = document.getElementById('preview-wrapper');
@@ -603,16 +686,38 @@
       const [width, height] = e.target.value.split('x').map(Number);
       document.getElementById('canvas-width').value = width;
       document.getElementById('canvas-height').value = height;
+      document.getElementById('canvas-size-warning').style.display = 'none';
       applyCanvasSize(width, height);
     });
-    ['canvas-width', 'canvas-height'].forEach(id => document.getElementById(id).addEventListener('change', () => {
-      const width = Number(document.getElementById('canvas-width').value);
-      const height = Number(document.getElementById('canvas-height').value);
-      if (!Number.isFinite(width) || !Number.isFinite(height) || width < 320 || width > 6000 || height < 240 || height > 6000) return;
+    function commitCanvasSize() {
+      const widthField = document.getElementById('canvas-width');
+      const heightField = document.getElementById('canvas-height');
+      const warning = document.getElementById('canvas-size-warning');
+      const width = Math.round(Number(widthField.value));
+      const height = Math.round(Number(heightField.value));
+      const messages = [];
+      [['가로', width], ['세로', height]].forEach(([label, value]) => {
+        if (!Number.isFinite(value) || value < 400) messages.push(`${label}는 최소 400px 이상부터 가능합니다.`);
+        else if (value > 3000) messages.push(`${label}는 최대 3000px까지만 가능합니다.`);
+      });
+      warning.textContent = messages.join(' ');
+      warning.style.display = messages.length ? 'block' : 'none';
+      if (messages.length) return;
       const presetValue = `${width}x${height}`;
       document.getElementById('canvas-preset').value = ['1200x900', '1600x900'].includes(presetValue) ? presetValue : '';
+      if (width === canvasWidth && height === canvasHeight) return;
       applyCanvasSize(width, height);
-    }));
+    }
+    ['canvas-width', 'canvas-height'].forEach(id => {
+      const input = document.getElementById(id);
+      input.addEventListener('blur', commitCanvasSize);
+      input.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        commitCanvasSize();
+        input.blur();
+      });
+    });
 
     function populateCharacterNames() {
       const names = [...new Set(storyData.map(scene => String(scene.name || '').trim()).filter(name => name && name !== '-'))];
@@ -654,13 +759,15 @@
       }
     }
     function updateCharacterStandingControls() {
-      const settings = characterStandingSettings[activeStandingCharacter] || { y: 0, size: 100 };
+      const settings = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 };
+      document.getElementById('character-standing-x').value = settings.x || 0;
       document.getElementById('character-standing-y').value = settings.y;
       document.getElementById('character-standing-size').value = settings.size;
+      document.getElementById('character-standing-x-value').textContent = `${settings.x || 0} px`;
       document.getElementById('character-standing-y-value').textContent = `${settings.y} px`;
       document.getElementById('character-standing-size-value').textContent = `${settings.size}%`;
     }
-    function getCharacterStandingSettings(name) { return characterStandingSettings[name] || { y: 0, size: 100 }; }
+    function getCharacterStandingSettings(name) { return characterStandingSettings[name] || { x: 0, y: 0, size: 100 }; }
     function getBackgroundScale(settings) {
       if (!settings.width || !settings.height) return 1;
       const coverScale = Math.max(canvasWidth / settings.width, canvasHeight / settings.height);
@@ -693,8 +800,8 @@
       const fontStack = isMyeongjo ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
       screen.style.setProperty('--dialogue-font-family', fontStack);
       screen.style.setProperty('--dialogue-font-size', `${dialogueFontSize}px`);
-      screen.style.setProperty('--dialogue-letter-spacing', isMyeongjo ? '-0.03em' : 'normal');
-      screen.style.setProperty('--speaker-letter-spacing', isMyeongjo ? '-0.03em' : '1px');
+      screen.style.setProperty('--dialogue-letter-spacing', isMyeongjo ? '0' : 'normal');
+      screen.style.setProperty('--speaker-letter-spacing', isMyeongjo ? '0' : '1px');
       const standingContainer = document.getElementById('standing-container');
       standingContainer.classList.toggle('has-shadow', standingShadow);
       standingContainer.style.transform = `translate(${standingX}px, ${-standingY}px) scale(${standingSize / 100})`;
@@ -737,6 +844,19 @@
       applyPreviewSettings();
       if (currentIndex >= 0) renderPreview(currentIndex);
     });
+    document.getElementById('standing-size-reset').addEventListener('click', () => {
+      standingSize = 100;
+      document.getElementById('standing-size').value = 100;
+      document.getElementById('standing-size-value').textContent = '100%';
+      applyPreviewSettings();
+      if (currentIndex >= 0) renderPreview(currentIndex);
+    });
+    document.getElementById('standing-gap-reset').addEventListener('click', () => {
+      standingGap = 0;
+      document.getElementById('standing-gap').value = 0;
+      document.getElementById('standing-gap-value').textContent = '0%';
+      if (currentIndex >= 0) renderPreview(currentIndex);
+    });
     ['base-bg-x', 'base-bg-y', 'base-bg-zoom'].forEach(id => document.getElementById(id).addEventListener('input', e => { document.getElementById(id + '-value').textContent = `${e.target.value}%`; }));
     document.getElementById('standing-shadow').addEventListener('change', e => {
       standingShadow = e.target.checked;
@@ -750,9 +870,16 @@
       container.querySelectorAll('.standing-character').forEach(img => { img.style.transition = ''; });
       container.classList.remove('instant-shadow-change');
     });
+    document.getElementById('character-standing-reset').addEventListener('click', () => {
+      if (!activeStandingCharacter) return;
+      delete characterStandingSettings[activeStandingCharacter];
+      updateCharacterStandingControls();
+      if (currentIndex >= 0) renderPreview(currentIndex);
+    });
     document.getElementById('standing-character-select').addEventListener('change', e => { activeStandingCharacter = e.target.value; updateCharacterStandingControls(); });
-    document.getElementById('character-standing-y').addEventListener('input', e => { const setting = characterStandingSettings[activeStandingCharacter] || { y: 0, size: 100 }; setting.y = Number(e.target.value); characterStandingSettings[activeStandingCharacter] = setting; document.getElementById('character-standing-y-value').textContent = `${setting.y} px`; if (currentIndex >= 0) renderPreview(currentIndex); });
-    document.getElementById('character-standing-size').addEventListener('input', e => { const setting = characterStandingSettings[activeStandingCharacter] || { y: 0, size: 100 }; setting.size = Number(e.target.value); characterStandingSettings[activeStandingCharacter] = setting; document.getElementById('character-standing-size-value').textContent = `${setting.size}%`; if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('character-standing-x').addEventListener('input', e => { const setting = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 }; setting.x = Number(e.target.value); characterStandingSettings[activeStandingCharacter] = setting; document.getElementById('character-standing-x-value').textContent = `${setting.x} px`; if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('character-standing-y').addEventListener('input', e => { const setting = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 }; setting.y = Number(e.target.value); characterStandingSettings[activeStandingCharacter] = setting; document.getElementById('character-standing-y-value').textContent = `${setting.y} px`; if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('character-standing-size').addEventListener('input', e => { const setting = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 }; setting.size = Number(e.target.value); characterStandingSettings[activeStandingCharacter] = setting; document.getElementById('character-standing-size-value').textContent = `${setting.size}%`; if (currentIndex >= 0) renderPreview(currentIndex); });
     document.getElementById('standing-division').addEventListener('change', e => { standingDivision = Number(e.target.value); renderCharacterPositionControls([...new Set(storyData.map(scene => String(scene.name || '').trim()).filter(name => name && name !== '-'))]); if (currentIndex >= 0) renderPreview(currentIndex); });
     document.getElementById('standing-position-lock').addEventListener('change', e => { standingPositionLock = e.target.checked; document.getElementById('character-position-controls').style.display = standingPositionLock ? 'flex' : 'none'; if (currentIndex >= 0) renderPreview(currentIndex); });
     [['base-bg-x','x'],['base-bg-y','y'],['base-bg-zoom','zoom']].forEach(([id,key]) => document.getElementById(id).addEventListener('input', e => { baseBackgroundSettings[key] = Number(e.target.value); updatePreviewBackground(currentIndex); }));
@@ -775,7 +902,7 @@
       const item = { image: '', start: 0, end: Math.max(0, storyData.length - 1), x: 50, y: 50, zoom: 0 };
       sceneBackgrounds.push(item);
       const row = document.createElement('div'); row.className = 'bg-range-card';
-      row.innerHTML = `<button type="button" class="remove-bg" aria-label="배경 삭제" title="배경 삭제"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><label class="bg-upload-tile" title="배경 이미지 업로드" aria-label="배경 이미지 업로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg><img alt="구간 배경 썸네일"><input type="file" accept="image/*"></label><div class="bg-range-controls"><strong style="font-size:11px;">구간 배경 ${sceneBackgrounds.length}</strong><div class="bg-range-pair"><label style="font-size:10px;">시작<select class="bg-start"></select></label><label style="font-size:10px;">종료<select class="bg-end"></select></label></div><div class="bg-range-settings"><label class="bg-mini-control">X <input type="range" min="0" max="100" value="50" data-setting="x"><small class="range-value" data-value-for="x">50%</small></label><label class="bg-mini-control">Y <input type="range" min="0" max="100" value="50" data-setting="y"><small class="range-value" data-value-for="y">50%</small></label><label class="bg-mini-control bg-size-control" style="grid-column:1/-1;"><span>크기 (0 = 가로 꽉 채움)</span><input type="range" min="-50" max="50" value="0" data-setting="zoom"><small class="range-value" data-value-for="zoom">0%</small></label></div></div>`;
+      row.innerHTML = `<button type="button" class="remove-bg" aria-label="배경 삭제" title="배경 삭제"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><label class="bg-upload-tile" title="배경 이미지 업로드" aria-label="배경 이미지 업로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg><img alt="구간 배경 썸네일"><input type="file" accept="image/*"></label><div class="bg-range-controls"><strong style="font-size:11px;">구간 배경 ${sceneBackgrounds.length}</strong><div class="bg-range-pair"><label style="font-size:10px;">시작<select class="bg-start"></select></label><label style="font-size:10px;">종료<select class="bg-end"></select></label></div><div class="bg-range-settings"><label class="bg-mini-control"><span>X</span><input type="range" min="0" max="100" value="50" data-setting="x"><small class="range-value" data-value-for="x">50%</small></label><label class="bg-mini-control"><span>Y</span><input type="range" min="0" max="100" value="50" data-setting="y"><small class="range-value" data-value-for="y">50%</small></label><label class="bg-mini-control bg-size-control"><span>S</span><input type="range" min="-50" max="50" value="0" data-setting="zoom"><small class="range-value" data-value-for="zoom">0%</small></label></div></div>`;
       const rangeSettings = row.querySelector('.bg-range-settings');
       const xControl = row.querySelector('[data-setting="x"]').closest('label');
       const yControl = row.querySelector('[data-setting="y"]').closest('label');
@@ -788,18 +915,15 @@
         return button;
       };
       const positionGroup = document.createElement('div'); positionGroup.className = 'bg-range-control-group';
-      const positionHeading = document.createElement('div'); positionHeading.className = 'bg-control-heading';
-      const positionTitle = document.createElement('span'); positionTitle.textContent = '위치 조절';
       const positionReset = makeResetButton('reset-position', '위치 초기화');
-      positionHeading.append(positionTitle, positionReset);
       const locationInputs = document.createElement('div'); locationInputs.className = 'bg-range-location-inputs';
-      locationInputs.append(xControl, yControl); positionGroup.append(positionHeading, locationInputs);
+      locationInputs.append(xControl, yControl, positionReset); positionGroup.append(locationInputs);
       const sizeGroup = document.createElement('div'); sizeGroup.className = 'bg-range-control-group';
-      const sizeHeading = document.createElement('div'); sizeHeading.className = 'bg-control-heading';
-      const sizeTitle = document.createElement('span'); sizeTitle.textContent = '크기 조절';
       const sizeReset = makeResetButton('reset-size', '크기 초기화');
-      sizeHeading.append(sizeTitle, sizeReset); sizeGroup.append(sizeHeading, zoomControl);
+      const sizeRow = document.createElement('div'); sizeRow.className = 'bg-range-size-row';
+      sizeRow.append(zoomControl, sizeReset); sizeGroup.append(sizeRow);
       rangeSettings.replaceChildren(positionGroup, sizeGroup);
+      row.appendChild(rangeSettings);
       positionReset.addEventListener('click', () => {
         item.x = 50; item.y = 50;
         xControl.querySelector('input').value = 50; yControl.querySelector('input').value = 50; xControl.querySelector('[data-value-for]').textContent = '50%'; yControl.querySelector('[data-value-for]').textContent = '50%';
@@ -948,9 +1072,9 @@
         if (slot > standingDivision || !figure) { img.style.display = 'none'; img.classList.remove('is-dimmed'); delete img.dataset.characterName; return; }
         const segmentWidth = canvasWidth / standingDivision;
         const baseCenter = (slot - 0.5) * segmentWidth;
-        img.style.left = `${canvasWidth / 2 + (baseCenter - canvasWidth / 2) * (1 + standingGap / 100)}px`;
-        img.style.transform = 'translateX(-50%)';
         const standing = getCharacterStandingSettings(figure.name);
+        img.style.left = `${canvasWidth / 2 + (baseCenter - canvasWidth / 2) * (1 + standingGap / 100) + Number(standing.x || 0)}px`;
+        img.style.transform = 'translateX(-50%)';
         img.style.bottom = `${standing.y}px`;
         img.style.height = `${850 * standing.size / 100}px`;
         if (img.src !== figure.image) img.src = figure.image;
@@ -960,21 +1084,21 @@
     }
 
     function applyJSONData(jsonData) {
-      if (jsonData.images) {
-        highResImageMap = jsonData.images;
-      }
+      if (!jsonData || typeof jsonData !== 'object' || Array.isArray(jsonData)) throw new Error('최상위 데이터가 객체가 아닙니다.');
+      const jsonMessages = Array.isArray(jsonData.messages) ? jsonData.messages : [];
+      if (jsonData.images && typeof jsonData.images === 'object' && !Array.isArray(jsonData.images)) highResImageMap = jsonData.images;
       if (!storyData.length && Array.isArray(jsonData.messages)) {
-        storyData = jsonData.messages.filter(message => message && typeof message.text === 'string').map(message => ({ name: String(message.name || message.speaker || '-'), text: message.text, color: message.color || '#ffffff', imageId: message.iconImage || undefined }));
+        storyData = jsonMessages.filter(message => message && typeof message === 'object' && typeof message.text === 'string').map(message => ({ name: String(message.name || message.speaker || '-'), text: message.text, color: message.color || '#ffffff', imageId: message.iconImage || undefined }));
       }
-      if (jsonData.messages && storyData.length > 0) {
+      if (jsonMessages.length && storyData.length > 0) {
         let jsonSearchIndex = 0;
         for (let i = 0; i < storyData.length; i++) {
             const htmlMsg = storyData[i];
-            const htmlCompareText = htmlMsg.text.replace(/\s/g, ''); 
+            const htmlCompareText = String(htmlMsg.text || '').replace(/\s/g, '');
             let matchedJsonMsg = null;
-            for (let j = jsonSearchIndex; j < jsonData.messages.length; j++) {
-                const m = jsonData.messages[j];
-                if (!m.text) continue;
+            for (let j = jsonSearchIndex; j < jsonMessages.length; j++) {
+                const m = jsonMessages[j];
+                if (!m || typeof m !== 'object' || typeof m.text !== 'string' || !m.text) continue;
                 const jsonCompareText = m.text.replace(/\s/g, '');
                 if (m.name === htmlMsg.name && htmlCompareText.includes(jsonCompareText)) {
                     matchedJsonMsg = m;
@@ -1092,13 +1216,20 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
+        let jsonData;
         try {
-          const jsonData = JSON.parse(e.target.result);
+          jsonData = JSON.parse(String(e.target.result).replace(/^\uFEFF/, ''));
+        } catch (error) {
+          alert("JSON 문법을 읽지 못했습니다. 파일이 손상됐거나 JSON 형식이 아닐 수 있습니다.");
+          return;
+        }
+        try {
           applyJSONData(jsonData);
           document.getElementById('icon-json').classList.add('done');
           checkReady();
         } catch (error) {
-          alert("JSON 파싱 오류! 코코포리아 로그 json 파일이 맞는지 확인해주세요.");
+          console.error('JSON 데이터 적용 오류:', error);
+          alert(`JSON은 읽었지만 데이터를 적용하지 못했습니다: ${error.message || error}`);
         }
       };
       reader.readAsText(file);
@@ -1113,7 +1244,6 @@
         const thumb = document.getElementById('bg-upload-thumb');
         thumb.src = bgBase64;
         document.getElementById('lbl-bg').classList.add('has-image');
-        document.getElementById('bg-base-name').textContent = file.name;
         updateSceneBackgroundAvailability();
         readImageSize(bgBase64, baseBackgroundSettings, () => updatePreviewBackground(currentIndex));
       };
@@ -1234,8 +1364,8 @@
       const standingXValue = standingX;
       const dialogueFontFamilyValue = dialogueFont === 'myeongjo' ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
       const dialogueFontSizeValue = dialogueFontSize;
-      const dialogueLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.03em' : 'normal';
-      const speakerLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.03em' : '1px';
+      const dialogueLetterSpacingValue = dialogueFont === 'myeongjo' ? '0' : 'normal';
+      const speakerLetterSpacingValue = dialogueFont === 'myeongjo' ? '0' : '1px';
       const canvasWidthValue = canvasWidth;
       const canvasHeightValue = canvasHeight;
       const bgmVolumeValue = bgmVolume;
@@ -1272,10 +1402,10 @@
     #replay-bgm { position:absolute; display:flex; flex-direction:column; gap:8px; width:210px; color:#fff; font:12px 'Noto Sans KR',sans-serif; }
     #replay-bgm-audio { display:none; }
     #replay-bgm-controls { display:flex; align-items:center; gap:7px; }
-    #replay-bgm-heading { margin:0; color:#ddd; font-size:11px; }
-    #replay-bgm-controls button { flex:0 0 auto; border:1px solid #555; border-radius:5px; background:#222; color:#fff; padding:5px 8px; cursor:pointer; }
-    #replay-bgm-controls input { min-width:0; flex:1; accent-color:#fff; }
-    #bgm-volume-value { color:#ccc; font-variant-numeric:tabular-nums; }
+    #replay-bgm-heading { flex:0 0 auto; margin:0; color:#ddd; font-size:11px; }
+    #replay-bgm-controls button { flex:0 0 auto; width:30px; height:28px; display:inline-flex; align-items:center; justify-content:center; border:0; outline:0; box-shadow:none; border-radius:0; background:transparent; color:#fff; padding:0; cursor:pointer; }
+    #replay-bgm-controls button svg { width:14px; height:14px; fill:currentColor; stroke:currentColor; }
+    #replay-bgm-controls input { flex:0 0 20px; width:20px; min-width:20px; height:48px; accent-color:#fff; writing-mode:vertical-lr; direction:rtl; }
     #bgm-status { margin:0; color:#ccc; font-size:10px; line-height:1.4; }
     #bottom-ui { position:absolute; top:0; left:0; transform:translateY(-100%); width:100%; display:flex; align-items:center; gap:15px; box-sizing:border-box; background:transparent; padding:12px 20px 14px; border-radius:0; z-index:20; cursor:default; opacity:0; pointer-events:none; transition:transform .25s ease,background-color .2s ease,opacity .6s ease; }
     #viewer-screen.has-started #bottom-ui { opacity:1; pointer-events:auto; }
@@ -1345,13 +1475,19 @@
     </div>
     <div id="log-view" role="log" aria-label="이전 대화 로그"><div id="log-text"></div></div>
   </div>
-  ${bgmDataUrl ? '<aside id="replay-bgm" aria-label="배경 음악"><p id="replay-bgm-heading">배경 음악</p><audio id="replay-bgm-audio" loop preload="auto" src="' + bgmDataUrl + '"></audio><div id="replay-bgm-controls"><button type="button" id="bgm-play-toggle">재생</button><label for="bgm-volume">음량</label><input id="bgm-volume" type="range" min="0" max="100" value="' + bgmVolumeValue + '"><span id="bgm-volume-value">' + bgmVolumeValue + '%</span></div><p id="bgm-status">음악은 반복 재생됩니다.</p></aside>' : ''}
+  ${bgmDataUrl ? '<aside id="replay-bgm" aria-label="배경 음악"><audio id="replay-bgm-audio" loop preload="auto" src="' + bgmDataUrl + '"></audio><div id="replay-bgm-controls"><p id="replay-bgm-heading">BGM</p><button type="button" id="bgm-play-toggle" aria-label="재생" title="재생"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg></button><input id="bgm-volume" type="range" min="0" max="100" value="' + bgmVolumeValue + '" aria-label="음량"></div></aside>' : ''}
   </div>
   <script>
     const canvasWidth = ${canvasWidthValue};
     const canvasHeight = ${canvasHeightValue};
     const bgmVolume = ${bgmVolumeValue};
     const bgmAudio = document.getElementById('replay-bgm-audio');
+    function setReplayBgmToggleIcon(isPlaying) {
+      if (!replayBgmToggle) return;
+      replayBgmToggle.setAttribute('aria-label', isPlaying ? '일시정지' : '재생');
+      replayBgmToggle.title = isPlaying ? '일시정지' : '재생';
+      replayBgmToggle.innerHTML = isPlaying ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg>';
+    }
     function startReplayBgm() {
       if (!bgmAudio) return;
       bgmAudio.volume = bgmVolume / 100;
@@ -1379,19 +1515,32 @@
     const replayBgmToggle = document.getElementById('bgm-play-toggle');
     if (replayBgmToggle) replayBgmToggle.addEventListener('click', e => {
       e.stopPropagation();
-      if (bgmAudio && !bgmAudio.paused) { bgmAudio.pause(); replayBgmToggle.textContent='재생'; }
+      if (bgmAudio && !bgmAudio.paused) { bgmAudio.pause(); setReplayBgmToggleIcon(false); }
       else startReplayBgm();
     });
     if (bgmAudio) {
-      bgmAudio.addEventListener('play', () => { if(replayBgmToggle) replayBgmToggle.textContent='일시정지'; });
-      bgmAudio.addEventListener('pause', () => { if(replayBgmToggle) replayBgmToggle.textContent='재생'; });
+      bgmAudio.addEventListener('play', () => setReplayBgmToggleIcon(true));
+      bgmAudio.addEventListener('pause', () => setReplayBgmToggleIcon(false));
       bgmAudio.addEventListener('error', () => { const status=document.getElementById('bgm-status'); if(status) status.textContent='이 오디오 파일은 브라우저에서 재생할 수 없습니다.'; });
     }
     const replayBgmVolume = document.getElementById('bgm-volume');
     if (replayBgmVolume) replayBgmVolume.addEventListener('input', e => {
-      const value=Number(e.target.value); document.getElementById('bgm-volume-value').textContent=\`\${value}%\`;
+      const value=Number(e.target.value);
       if (bgmAudio) bgmAudio.volume = value / 100;
     });
+    document.addEventListener('wheel', event => {
+      if (!(event.target instanceof Element)) return;
+      const slider = event.target.closest('input[type="range"]');
+      if (!slider || slider.disabled) return;
+      event.preventDefault();
+      const min=slider.min===''?0:Number(slider.min), max=slider.max===''?100:Number(slider.max);
+      const rawStep=slider.step===''||slider.step==='any'?1:Number(slider.step), step=Number.isFinite(rawStep)&&rawStep>0?rawStep:1;
+      const direction=event.deltaY<0?1:event.deltaY>0?-1:0;
+      if (!direction) return;
+      const next=Math.min(max,Math.max(min,Number(slider.value)+direction*step));
+      if (next===Number(slider.value)) return;
+      slider.value=String(next); slider.dispatchEvent(new Event('input',{bubbles:true}));
+    }, { passive:false });
 
     const storyData = ${storyJson};
     function preloadReplayFonts() {
@@ -1415,7 +1564,7 @@
     const standingDivision = ${standingDivision};
     const standingGap = ${standingGapValue};
     const standingPositionLock = ${standingPositionLock};
-    const standingDefaults = { y: 0, size: 100 };
+    const standingDefaults = { x: 0, y: 0, size: 100 };
     let currentIndex = -1;
     let isTyping = false;
     let currentText = "";
@@ -1525,9 +1674,9 @@
         if (slot > standingDivision || !figure) { img.style.display='none'; img.classList.remove('is-dimmed'); delete img.dataset.characterName; return; }
         const segmentWidth = canvasWidth / standingDivision;
         const baseCenter = (slot - 0.5) * segmentWidth;
-        img.style.left = (canvasWidth / 2 + (baseCenter - canvasWidth / 2) * (1 + standingGap / 100)) + 'px';
-        img.style.transform = 'translateX(-50%)';
         const standing = getCharacterStandingSettings(figure.name);
+        img.style.left = (canvasWidth / 2 + (baseCenter - canvasWidth / 2) * (1 + standingGap / 100) + Number(standing.x || 0)) + 'px';
+        img.style.transform = 'translateX(-50%)';
         img.style.bottom = \`\${standing.y}px\`;
         img.style.height = \`\${850 * standing.size / 100}px\`;
         if (img.src !== figure.image) img.src = figure.image;
