@@ -420,6 +420,7 @@
     #title-card { position:absolute; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(0,0,0,.78); color:#fff; text-align:center; font-family:'BookkMyungjo', serif; opacity:1; transition:opacity .6s ease; cursor:pointer; }
     #title-card.is-visible { display:flex; }
     #title-card.is-leaving { opacity:0; pointer-events:none; }
+    .is-title-showing #dialogue-box { opacity:0; visibility:hidden; transition:none; }
     #title-rule { font-size:24px; letter-spacing:.32em; }
     #title-main { width:80%; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
     #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
@@ -624,6 +625,7 @@
       applyTitleText(card, titleSettings);
       card.classList.remove('is-leaving');
       card.classList.toggle('is-visible', titleSettings.enabled);
+      document.getElementById('preview-screen').classList.toggle('is-title-showing', titleSettings.enabled);
     }
     function isPreviewTitleShowing() {
       const card = document.getElementById('title-card');
@@ -633,7 +635,11 @@
       const card = document.getElementById('title-card');
       card.classList.add('is-leaving');
       clearTimeout(titleHideTimer);
-      titleHideTimer = setTimeout(() => { card.classList.remove('is-visible', 'is-leaving'); }, 600);
+      titleHideTimer = setTimeout(() => {
+        card.classList.remove('is-visible', 'is-leaving');
+        document.getElementById('preview-screen').classList.remove('is-title-showing');
+        if (storyData.length) { clearInterval(typeInterval); clearTimeout(autoPlayTimeout); isTyping = false; currentIndex = 0; renderPreview(currentIndex); }
+      }, 600);
     }
     let isTyping = false;
     let currentText = "";
@@ -1513,6 +1519,7 @@
     #title-card { position:absolute; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(0,0,0,.78); color:#fff; text-align:center; font-family:'BookkMyungjo', serif; opacity:1; transition:opacity .6s ease; cursor:pointer; }
     #title-card.is-visible { display:flex; }
     #title-card.is-leaving { opacity:0; pointer-events:none; }
+    .is-title-showing #dialogue-box { opacity:0; visibility:hidden; transition:none; }
     #title-rule { font-size:24px; letter-spacing:.32em; }
     #title-main { width:80%; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
     #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
@@ -1888,7 +1895,7 @@
         if (card.classList.contains('is-visible')) {
           isLeavingTitle = true;
           card.classList.add('is-leaving');
-          setTimeout(function() { card.classList.remove('is-visible'); isLeavingTitle = false; currentIndex = 0; renderScene(currentIndex); }, 600);
+          setTimeout(function() { card.classList.remove('is-visible'); document.getElementById('viewer-screen').classList.remove('is-title-showing'); isLeavingTitle = false; currentIndex = 0; renderScene(currentIndex); }, 600);
         } else { currentIndex = 0; renderScene(currentIndex); }
         return;
       }
@@ -1928,6 +1935,7 @@
       });
       document.getElementById('title-main').style.letterSpacing = titleSettings.spacing + 'em';
       card.classList.add('is-visible');
+      document.getElementById('viewer-screen').classList.add('is-title-showing');
     } else if (storyData.length) { currentIndex = 0; renderScene(currentIndex); }
   <\/script>
 </body>
