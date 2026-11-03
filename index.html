@@ -500,7 +500,7 @@
       <section class="background-settings-box resource-step-box">
         <div class="sidebar-title resource-step-title" style="margin:0;">3. 배경 이미지 설정</div>
         <div class="bg-base-row">
-          <label class="bg-upload-tile" id="lbl-bg" title="배경 이미지 업로드" aria-label="배경 이미지 업로드">
+          <label class="bg-upload-tile" id="lbl-bg" aria-label="배경 이미지 업로드">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg>
             <img id="bg-upload-thumb" alt="배경 이미지 미리보기">
             <input type="file" id="bg-upload" accept="image/*">
@@ -510,13 +510,13 @@
               <div class="bg-base-location-inputs">
                 <label class="bg-mini-control"><span>X</span><input id="base-bg-x" type="range" min="0" max="100" value="50"><small class="range-value" id="base-bg-x-value">50%</small></label>
                 <label class="bg-mini-control"><span>Y</span><input id="base-bg-y" type="range" min="0" max="100" value="50"><small class="range-value" id="base-bg-y-value">50%</small></label>
-                <button type="button" id="base-bg-position-reset" class="bg-reset-icon" aria-label="위치 초기화" title="위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+                <button type="button" id="base-bg-position-reset" class="bg-reset-icon" aria-label="위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
               </div>
             </div>
             <div class="bg-base-control-group">
               <div class="bg-base-size-row">
                 <label class="bg-mini-control bg-size-control"><span>S</span><input id="base-bg-zoom" type="range" min="-50" max="50" value="0"><small class="range-value" id="base-bg-zoom-value">0%</small></label>
-                <button type="button" id="base-bg-size-reset" class="bg-reset-icon" aria-label="크기 초기화" title="크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+                <button type="button" id="base-bg-size-reset" class="bg-reset-icon" aria-label="크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
               </div>
             </div>
           </div>
@@ -534,9 +534,9 @@
             <input type="file" id="bgm-upload" accept="audio/*">
           </label>
           <div class="bgm-volume-row">
-            <button type="button" id="bgm-play-toggle" class="bgm-icon-btn" aria-label="재생" title="재생"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg></button>
+            <button type="button" id="bgm-play-toggle" class="bgm-icon-btn" aria-label="재생"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg></button>
             <svg class="bgm-volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M16 9a5 5 0 0 1 0 6m2.5-8.5a8.5 8.5 0 0 1 0 11"/></svg>
-            <input id="bgm-volume" class="bgm-volume-slider" type="range" min="0" max="100" value="35" aria-label="배경 음악 음량" title="음량">
+            <input id="bgm-volume" class="bgm-volume-slider" type="range" min="0" max="100" value="35" aria-label="배경 음악 음량">
           </div>
           <audio id="bgm-audio" class="bgm-audio" loop preload="metadata"></audio>
           <p id="bgm-status" class="sr-only" role="status" aria-live="polite"></p>
@@ -562,11 +562,11 @@
               <div class="bg-base-location-inputs">
                 <label class="bg-mini-control"><span>X</span><input id="title-img-x" type="range" min="0" max="100" value="50"></label>
                 <label class="bg-mini-control"><span>Y</span><input id="title-img-y" type="range" min="0" max="100" value="50"></label>
-                <button type="button" id="title-img-position-reset" class="bg-reset-icon" aria-label="타이틀 이미지 위치 초기화" title="위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+                <button type="button" id="title-img-position-reset" class="bg-reset-icon" aria-label="타이틀 이미지 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
               </div>
               <div class="bg-base-size-row">
                 <label class="bg-mini-control bg-size-control"><span>S</span><input id="title-img-zoom" type="range" min="-50" max="50" value="0"></label>
-                <button type="button" id="title-img-size-reset" class="bg-reset-icon" aria-label="타이틀 이미지 크기 초기화" title="크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+                <button type="button" id="title-img-size-reset" class="bg-reset-icon" aria-label="타이틀 이미지 크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
               </div>
             </div>
             </div>
@@ -613,13 +613,13 @@
           <div class="standing-xy-inputs">
             <label class="standing-mini-control"><span>X</span><input id="standing-x" type="range" min="-300" max="300" step="5" value="0"><small class="range-value" id="standing-x-value">0 px</small></label>
             <label class="standing-mini-control"><span>Y</span><input id="standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="standing-y-value">0 px</small></label>
-            <button type="button" id="standing-position-reset" class="bg-reset-icon" aria-label="스탠딩 위치 초기화" title="스탠딩 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+            <button type="button" id="standing-position-reset" class="bg-reset-icon" aria-label="스탠딩 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
           </div>
           <div class="standing-size-row">
             <label class="standing-mini-control"><span>S</span><input id="standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="standing-size-value">100%</small></label>
-            <button type="button" id="standing-size-reset" class="bg-reset-icon" aria-label="스탠딩 크기 초기화" title="스탠딩 크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+            <button type="button" id="standing-size-reset" class="bg-reset-icon" aria-label="스탠딩 크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
           </div>
-          <div class="standing-gap-control"><div class="standing-gap-row"><label class="standing-gap-slider"><span>간격</span><input id="standing-gap" type="range" min="-50" max="50" step="1" value="0"><small class="range-value" id="standing-gap-value">0%</small></label><button type="button" id="standing-gap-reset" class="bg-reset-icon" aria-label="간격 초기화" title="간격 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div></div>
+          <div class="standing-gap-control"><div class="standing-gap-row"><label class="standing-gap-slider"><span>간격</span><input id="standing-gap" type="range" min="-50" max="50" step="1" value="0"><small class="range-value" id="standing-gap-value">0%</small></label><button type="button" id="standing-gap-reset" class="bg-reset-icon" aria-label="간격 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div></div>
         </div>
         <div class="standing-global-controls standing-subsection">
           <div class="bg-control-heading"><span>캐릭터별 조정</span></div>
@@ -627,11 +627,11 @@
           <div class="standing-xy-inputs">
             <label class="standing-mini-control"><span>X</span><input id="character-standing-x" type="range" min="-200" max="200" step="5" value="0"><small class="range-value" id="character-standing-x-value">0 px</small></label>
             <label class="standing-mini-control"><span>Y</span><input id="character-standing-y" type="range" min="-200" max="200" step="5" value="0"><small class="range-value" id="character-standing-y-value">0 px</small></label>
-            <button type="button" id="character-standing-position-reset" class="bg-reset-icon" aria-label="캐릭터 위치 초기화" title="캐릭터 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+            <button type="button" id="character-standing-position-reset" class="bg-reset-icon" aria-label="캐릭터 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
           </div>
           <div class="standing-size-row">
             <label class="standing-mini-control"><span>S</span><input id="character-standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="character-standing-size-value">100%</small></label>
-            <button type="button" id="character-standing-size-reset" class="bg-reset-icon" aria-label="캐릭터 크기 초기화" title="캐릭터 크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+            <button type="button" id="character-standing-size-reset" class="bg-reset-icon" aria-label="캐릭터 크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
           </div>
         </div>
         </section>
@@ -664,7 +664,7 @@
             <div id="next-arrow">▼</div>
           </div>
           <div id="bottom-ui">
-            <button id="auto-play-btn" title="자동 재생">▶</button>
+            <button id="auto-play-btn" aria-label="자동 재생">▶</button>
             <input type="range" id="progress-slider" min="0" max="0" value="0">
             <span id="page-indicator">0 / 0</span>
             <button id="controls-toggle" aria-label="진행도 창 열기" aria-expanded="false">▼</button>
@@ -699,7 +699,7 @@
         const row = document.createElement('div');
         row.className = 'log-row' + (hiddenLines.has(index) ? ' is-hidden' : '') + (index === currentIndex ? ' is-current' : '');
         row.dataset.index = index;
-        const main = document.createElement('button'); main.type = 'button'; main.className = 'log-row-main'; main.title = '이 대사로 이동';
+        const main = document.createElement('button'); main.type = 'button'; main.className = 'log-row-main';
         const num = document.createElement('span'); num.className = 'log-row-index'; num.textContent = index + 1;
         const body = document.createElement('span'); body.className = 'log-row-body';
         const name = String(scene.name || '').trim();
@@ -716,7 +716,7 @@
     }
     function setLogToggleLabel(toggle, isHidden) {
       const label = isHidden ? '숨김 해제' : '숨기기';
-      toggle.setAttribute('aria-label', label); toggle.title = label; toggle.setAttribute('aria-pressed', String(isHidden));
+      toggle.setAttribute('aria-label', label); toggle.setAttribute('aria-pressed', String(isHidden));
     }
     function markCurrentLogRow() {
       const list = document.getElementById('log-editor-list');
@@ -824,7 +824,6 @@
     function setBgmToggleIcon(isPlaying) {
       const button = document.getElementById('bgm-play-toggle');
       button.setAttribute('aria-label', isPlaying ? '일시정지' : '재생');
-      button.title = isPlaying ? '일시정지' : '재생';
       button.innerHTML = isPlaying ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg>';
     }
     function toggleBgm() {
@@ -1098,7 +1097,7 @@
       const item = { image: '', start: 0, end: Math.max(0, storyData.length - 1), x: 50, y: 50, zoom: 0 };
       sceneBackgrounds.push(item);
       const row = document.createElement('div'); row.className = 'bg-range-card';
-      row.innerHTML = `<button type="button" class="remove-bg" aria-label="배경 삭제" title="배경 삭제"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><label class="bg-upload-tile" title="배경 이미지 업로드" aria-label="배경 이미지 업로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg><img alt="구간 배경 썸네일"><input type="file" accept="image/*"></label><div class="bg-range-controls"><strong style="font-size:11px;">구간 배경 ${sceneBackgrounds.length}</strong><div class="bg-range-pair"><label style="font-size:10px;">시작<select class="bg-start"></select></label><label style="font-size:10px;">종료<select class="bg-end"></select></label></div><div class="bg-range-settings"><label class="bg-mini-control"><span>X</span><input type="range" min="0" max="100" value="50" data-setting="x"><small class="range-value" data-value-for="x">50%</small></label><label class="bg-mini-control"><span>Y</span><input type="range" min="0" max="100" value="50" data-setting="y"><small class="range-value" data-value-for="y">50%</small></label><label class="bg-mini-control bg-size-control"><span>S</span><input type="range" min="-50" max="50" value="0" data-setting="zoom"><small class="range-value" data-value-for="zoom">0%</small></label></div></div>`;
+      row.innerHTML = `<button type="button" class="remove-bg" aria-label="배경 삭제"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><label class="bg-upload-tile" aria-label="배경 이미지 업로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg><img alt="구간 배경 썸네일"><input type="file" accept="image/*"></label><div class="bg-range-controls"><strong style="font-size:11px;">구간 배경 ${sceneBackgrounds.length}</strong><div class="bg-range-pair"><label style="font-size:10px;">시작<select class="bg-start"></select></label><label style="font-size:10px;">종료<select class="bg-end"></select></label></div><div class="bg-range-settings"><label class="bg-mini-control"><span>X</span><input type="range" min="0" max="100" value="50" data-setting="x"><small class="range-value" data-value-for="x">50%</small></label><label class="bg-mini-control"><span>Y</span><input type="range" min="0" max="100" value="50" data-setting="y"><small class="range-value" data-value-for="y">50%</small></label><label class="bg-mini-control bg-size-control"><span>S</span><input type="range" min="-50" max="50" value="0" data-setting="zoom"><small class="range-value" data-value-for="zoom">0%</small></label></div></div>`;
       const rangeSettings = row.querySelector('.bg-range-settings');
       const xControl = row.querySelector('[data-setting="x"]').closest('label');
       const yControl = row.querySelector('[data-setting="y"]').closest('label');
@@ -1106,7 +1105,7 @@
       const makeResetButton = (className, label) => {
         const button = document.createElement('button');
         button.type = 'button'; button.className = 'bg-reset-icon ' + className;
-        button.setAttribute('aria-label', label); button.title = label;
+        button.setAttribute('aria-label', label);
         button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg>';
         return button;
       };
@@ -1776,7 +1775,7 @@
       <div id="next-arrow">▼</div>
     </div>
     <div id="bottom-ui">
-      <button id="auto-play-btn" title="자동 재생">▶</button>
+      <button id="auto-play-btn" aria-label="자동 재생">▶</button>
       <input type="range" id="progress-slider" min="0" max="0" value="0">
       <span id="page-indicator">0 / 0</span>
       <button id="controls-toggle" aria-label="진행도 창 열기" aria-expanded="false">▼</button>
@@ -1794,7 +1793,6 @@
     function setReplayBgmToggleIcon(isPlaying) {
       if (!replayBgmToggle) return;
       replayBgmToggle.setAttribute('aria-label', isPlaying ? '일시정지' : '재생');
-      replayBgmToggle.title = isPlaying ? '일시정지' : '재생';
       replayBgmToggle.innerHTML = isPlaying ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg>';
     }
     function startReplayBgm() {
