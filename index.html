@@ -147,6 +147,8 @@
     .setting-label { color:var(--text-muted); font-size:12px; white-space:nowrap; }
     .setting-hint { color:var(--text-muted); font-size:11px; line-height:1.5; }
     #character-position-controls { display:flex; flex-direction:column; gap:8px; }
+    .title-toggle-heading { display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+    .title-toggle-heading input { width:16px; height:16px; margin:0; accent-color:var(--accent); }
     #title-settings-controls { display:none; flex-direction:column; gap:8px; min-width:0; }
     #title-settings-controls.is-open { display:flex; }
     #title-text-fields { display:flex; flex-direction:column; gap:8px; min-width:0; }
@@ -503,8 +505,7 @@
           <p id="bgm-status" class="sr-only" role="status" aria-live="polite"></p>
         </section>
         <section class="settings-group">
-          <div class="sidebar-title">타이틀 화면</div>
-          <label class="standing-lock-row plain"><span>타이틀 화면 사용</span><input id="title-enabled" type="checkbox"></label>
+          <label class="sidebar-title title-toggle-heading"><span>타이틀 화면</span><input id="title-enabled" type="checkbox" aria-label="타이틀 화면 사용"></label>
           <div id="title-settings-controls" data-mode="text">
             <label class="setting-row"><span class="setting-label">모드</span><select id="title-mode"><option value="text">텍스트</option><option value="image">이미지</option></select></label>
             <div id="title-text-fields">
