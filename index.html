@@ -436,6 +436,7 @@
     #title-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:none; transform-origin:center center; }
     #title-card.is-image-mode #title-image { display:block; }
     #title-card.is-image-mode #title-text { display:none; }
+    #title-card.is-gothic { font-family:'Pretendard', sans-serif; }
     #log-view { font-family:var(--dialogue-font-family, 'Noto Sans KR', sans-serif); letter-spacing:var(--dialogue-letter-spacing, normal); display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
     #log-text .log-entry { margin-bottom:1em; }
     .spacing-neutral-punctuation { letter-spacing:normal; }
@@ -511,6 +512,7 @@
           <div id="title-settings-controls" data-mode="text">
             <label class="setting-row"><span class="setting-label">모드</span><select id="title-mode"><option value="text">텍스트</option><option value="image">이미지</option></select></label>
             <div id="title-text-fields">
+            <label class="setting-row"><span class="setting-label">폰트</span><select id="title-font"><option value="myeongjo">명조</option><option value="gothic">고딕</option></select></label>
             <label class="title-field"><span class="setting-label">룰 (상단)</span><input id="title-rule-input" type="text" placeholder="예: inSANe"></label>
             <label class="title-field"><span class="setting-label">제목 (가운데)</span><textarea id="title-main-input" rows="2" placeholder="시나리오 제목"></textarea></label>
             <label class="standing-mini-control title-spacing-control"><span>자간</span><input id="title-spacing" type="range" min="-0.1" max="0.5" step="0.01" value="0"></label>
@@ -589,8 +591,8 @@
           <div class="bg-control-heading"><span>캐릭터별 조정</span></div>
           <select id="standing-character-select" aria-label="조정할 캐릭터"></select>
           <div class="standing-xy-inputs">
-            <label class="standing-mini-control"><span>X</span><input id="character-standing-x" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-x-value">0 px</small></label>
-            <label class="standing-mini-control"><span>Y</span><input id="character-standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-y-value">0 px</small></label>
+            <label class="standing-mini-control"><span>X</span><input id="character-standing-x" type="range" min="-200" max="200" step="5" value="0"><small class="range-value" id="character-standing-x-value">0 px</small></label>
+            <label class="standing-mini-control"><span>Y</span><input id="character-standing-y" type="range" min="-200" max="200" step="5" value="0"><small class="range-value" id="character-standing-y-value">0 px</small></label>
             <button type="button" id="character-standing-position-reset" class="bg-reset-icon" aria-label="캐릭터 위치 초기화" title="캐릭터 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
           </div>
           <div class="standing-size-row">
@@ -642,7 +644,7 @@
     const baseBackgroundSettings = { x: 50, y: 50, zoom: 0 };
     let highResImageMap = {}; 
     let currentIndex = 0;
-    const titleSettings = { enabled: false, mode: 'text', image: '', imageX: 50, imageY: 50, imageZoom: 0, rule: '', title: '', credit: '', spacing: 0 };
+    const titleSettings = { enabled: false, mode: 'text', image: '', imageX: 50, imageY: 50, imageZoom: 0, font: 'myeongjo', rule: '', title: '', credit: '', spacing: 0 };
     let titleHideTimer = null;
     function applyTitleText(root, settings) {
       [['title-rule', settings.rule], ['title-main', settings.title], ['title-credit', settings.credit]].forEach(([id, text]) => {
@@ -651,6 +653,7 @@
       root.querySelector('#title-main').style.letterSpacing = settings.spacing + 'em';
       const isImage = settings.mode === 'image';
       root.classList.toggle('is-image-mode', isImage);
+      root.classList.toggle('is-gothic', settings.font === 'gothic');
       const image = root.querySelector('#title-image');
       if (isImage && settings.image) image.src = settings.image; else image.removeAttribute('src');
       image.style.transform = `translate(${settings.imageX - 50}%, ${settings.imageY - 50}%) scale(${1 + settings.imageZoom / 100})`;
@@ -1436,6 +1439,7 @@
     [['title-rule-input', 'rule'], ['title-main-input', 'title'], ['title-credit-input', 'credit']].forEach(([id, key]) => {
       document.getElementById(id).addEventListener('input', e => { titleSettings[key] = e.target.value; showPreviewTitle(); });
     });
+    document.getElementById('title-font').addEventListener('change', e => { titleSettings.font = e.target.value; showPreviewTitle(); });
     document.getElementById('title-mode').addEventListener('change', e => {
       titleSettings.mode = e.target.value;
       document.getElementById('title-settings-controls').dataset.mode = titleSettings.mode;
@@ -1606,6 +1610,7 @@
     #title-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:none; transform-origin:center center; }
     #title-card.is-image-mode #title-image { display:block; }
     #title-card.is-image-mode #title-text { display:none; }
+    #title-card.is-gothic { font-family:'Pretendard', sans-serif; }
     #log-view { font-family: ${dialogueFontFamilyValue}; letter-spacing: ${dialogueLetterSpacingValue}; display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
     #log-text .log-entry { margin-bottom:1em; }
     .spacing-neutral-punctuation { letter-spacing:normal; }
@@ -2029,6 +2034,7 @@
         const el = document.getElementById(pair[0]); el.textContent = pair[1]; el.dataset.empty = String(!String(pair[1]).trim());
       });
       document.getElementById('title-main').style.letterSpacing = titleSettings.spacing + 'em';
+      if (titleSettings.font === 'gothic') card.classList.add('is-gothic');
       if (titleSettings.mode === 'image') { card.classList.add('is-image-mode'); const titleImage = document.getElementById('title-image'); if (titleSettings.image) titleImage.src = titleSettings.image; titleImage.style.transform = 'translate(' + (titleSettings.imageX - 50) + '%, ' + (titleSettings.imageY - 50) + '%) scale(' + (1 + titleSettings.imageZoom / 100) + ')'; }
       card.classList.add('is-visible');
       document.getElementById('viewer-screen').classList.add('is-title-showing');
