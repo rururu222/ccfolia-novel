@@ -244,9 +244,9 @@
     #preview-screen.has-started #bottom-ui { display:flex !important; opacity:1; pointer-events:auto; }
     #bottom-ui.is-open { transform: translateY(0); }
     #bottom-ui:hover, #bottom-ui.is-open { background-color: rgba(20,20,20,.85); }
-    #controls-toggle { position:absolute; bottom:-38px; left:50%; transform:translate(-50%,0); width:64px; height:30px; border:0; border-radius:0 0 10px 10px; color:white; background:transparent; cursor:pointer; font-size:16px; transition:transform .2s ease; }
-    #bottom-ui:hover #controls-toggle { transform:translate(-50%,4px); }
-    #bottom-ui.is-open #controls-toggle:hover { transform:translate(-50%,-4px); }
+    #controls-toggle { position:absolute; bottom:-38px; left:0; transform:translateY(0); width:100%; height:30px; border:0; border-radius:0; color:white; background:transparent; cursor:pointer; font-size:16px; transition:transform .2s ease; }
+    #bottom-ui:hover #controls-toggle { transform:translateY(4px); }
+    #bottom-ui.is-open #controls-toggle:hover { transform:translateY(-4px); }
     
     #auto-play-btn {
       position: relative;
@@ -1700,9 +1700,9 @@
     #viewer-screen.has-started #bottom-ui { opacity:1; pointer-events:auto; }
     #bottom-ui.is-open { transform:translateY(0); }
     #bottom-ui:hover,#bottom-ui.is-open { background-color:rgba(20,20,20,.85); }
-    #controls-toggle { position:absolute; bottom:-38px; left:50%; transform:translate(-50%,0); width:64px; height:30px; border:0; border-radius:0 0 10px 10px; color:white; background:transparent; cursor:pointer; font-size:16px; transition:transform .2s ease; }
-    #bottom-ui:hover #controls-toggle { transform:translate(-50%,4px); }
-    #bottom-ui.is-open #controls-toggle:hover { transform:translate(-50%,-4px); }
+    #controls-toggle { position:absolute; bottom:-38px; left:0; transform:translateY(0); width:100%; height:30px; border:0; border-radius:0; color:white; background:transparent; cursor:pointer; font-size:16px; transition:transform .2s ease; }
+    #bottom-ui:hover #controls-toggle { transform:translateY(4px); }
+    #bottom-ui.is-open #controls-toggle:hover { transform:translateY(-4px); }
     #auto-play-btn { position:relative; background:transparent; color:white; border:none; padding:0; width:32px; height:32px; border-radius:0; display:flex; justify-content:center; align-items:center; cursor:pointer; text-align:center; font-size:0; transition:opacity .2s; }
     #auto-play-btn::before { content:""; position:absolute; left:50%; top:50%; transform:translate(-66.667%,-50%); width:0; height:0; border-top:7px solid transparent; border-bottom:7px solid transparent; border-left:10px solid #fff; }
     #auto-play-btn.is-playing::before { width:10px; height:10px; transform:translate(-50%,-50%); border:0; background:#fff; }
