@@ -1647,6 +1647,8 @@
       const characterStandingSettingsJson = JSON.stringify(characterStandingSettings);
       const characterPositionSettingsJson = JSON.stringify(characterPositionSettings);
       const standingGapValue = standingGap;
+      const pageTitleText = (titleSettings.enabled && titleSettings.mode === 'text' ? String(titleSettings.title || '').replace(/\s+/g, ' ').trim() : '') || 'TRPG Replay';
+      const pageTitleHtml = pageTitleText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       const titleSettingsJson = JSON.stringify(Object.assign({}, titleSettings, { image: titleSettings.mode === 'image' ? titleSettings.image : '' })).replace(/</g, '\\u003c');
       const standingShadowValue = standingShadow;
       const standingXValue = standingX;
@@ -1663,7 +1665,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRPG Replay</title>
+  <title>${pageTitleHtml}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
