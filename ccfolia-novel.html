@@ -302,6 +302,16 @@
     .font-setting-row { display:grid; grid-template-columns:40px minmax(0,1fr) minmax(0,1fr); align-items:center; gap:6px; min-width:0; font-size:12px; }
     .font-setting-row select { width:100%; min-width:0; box-sizing:border-box; padding:6px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-main); font-size:12px; }
     select { appearance:none; -webkit-appearance:none; padding-right:30px !important; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='m3 4.5 3 3 3-3' stroke='%23a1a1aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important; background-repeat:no-repeat !important; background-position:right 10px center !important; background-size:12px 12px !important; }
+    .bgm-settings { gap:8px; }
+    .bgm-url-row { display:flex; gap:6px; min-width:0; }
+    .bgm-url-row input { flex:1; min-width:0; box-sizing:border-box; padding:7px 8px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-panel); font-size:11px; }
+    .bgm-action-btn { flex:0 0 auto; padding:6px 9px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-panel); font-size:11px; cursor:pointer; }
+    .bgm-control-row { display:flex; align-items:center; gap:8px; font-size:11px; }
+    .bgm-control-row input[type="range"] { flex:1; min-width:0; accent-color:var(--accent); }
+    .bgm-volume-value { flex:0 0 34px; text-align:right; color:var(--text-muted); font-variant-numeric:tabular-nums; }
+    .bgm-status { min-height:14px; margin:0; color:var(--text-muted); font-size:10px; line-height:1.4; }
+    .bgm-player { width:220px; height:200px; max-width:100%; overflow:hidden; border-radius:6px; background:#000; }
+    .bgm-player iframe { display:block; max-width:100%; }
     .standing-adjust-grid .range-control-row { gap:3px; }
     .standing-adjust-grid .range-value { flex-basis:34px; width:34px; font-size:9px; }
 
@@ -405,6 +415,21 @@
           <button class="upload-btn" id="add-scene-bg" type="button" aria-disabled="true" style="justify-content:center; opacity:.55; padding:9px; cursor:not-allowed;">＋ 구간별 배경 이미지 추가</button>
         </div>
         <p id="scene-bg-notice" class="scene-bg-notice" role="status" style="display:none;"></p>
+      </section>
+      <section class="background-settings-box bgm-settings">
+        <div class="sidebar-title" style="margin:0;">배경 음악 (YouTube)</div>
+        <div class="bgm-url-row">
+          <input type="url" id="bgm-url" placeholder="YouTube 링크를 입력하세요" aria-label="YouTube 배경 음악 링크">
+          <button type="button" id="bgm-apply" class="bgm-action-btn">적용</button>
+        </div>
+        <div class="bgm-control-row">
+          <button type="button" id="bgm-play-toggle" class="bgm-action-btn">재생</button>
+          <label for="bgm-volume">음량</label>
+          <input id="bgm-volume" type="range" min="0" max="100" value="35">
+          <output id="bgm-volume-value" class="bgm-volume-value">35%</output>
+        </div>
+        <div id="bgm-player" class="bgm-player" aria-label="YouTube 음악 플레이어"></div>
+        <p id="bgm-status" class="bgm-status" role="status">링크를 적용한 뒤 재생을 누르세요. 재생은 반복됩니다.</p>
       </section>
       <div id="custom-ui-panel" style="display: none;">
         <div class="sidebar-title">화면 설정</div>
@@ -514,6 +539,76 @@
     let dialogueFont = "gothic";
     let dialogueFontSize = 20;
     let dialogueFontsRequested = false;
+    let bgmVideoId = '';
+    let bgmVolume = 35;
+    let bgmPlayer = null;
+    let bgmPendingPlay = false;
+
+    function parseYoutubeVideoId(value) {
+      try {
+        const url = new URL(String(value).trim());
+        const host = url.hostname.replace(/^www\./, '').toLowerCase();
+        let id = '';
+        if (host === 'youtu.be') id = url.pathname.split('/').filter(Boolean)[0] || '';
+        else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
+          id = url.searchParams.get('v') || url.pathname.match(/^\/(?:embed|shorts|live)\/([^/?]+)/)?.[1] || '';
+        }
+        return /^[\w-]{11}$/.test(id) ? id : '';
+      } catch (_) { return ''; }
+    }
+    function setBgmStatus(message) { document.getElementById('bgm-status').textContent = message; }
+    function createBgmPlayer() {
+      if (!bgmVideoId || !window.YT || !YT.Player) return;
+      if (bgmPlayer) { bgmPlayer.destroy(); bgmPlayer = null; }
+      const playerVars = { autoplay: 0, controls: 1, loop: 1, playlist: bgmVideoId, playsinline: 1, rel: 0 };
+      if (location.protocol !== 'file:' && location.origin !== 'null') playerVars.origin = location.origin;
+      bgmPlayer = new YT.Player('bgm-player', {
+        width: '220', height: '200', videoId: bgmVideoId,
+        playerVars,
+        events: {
+          onReady: event => {
+            event.target.setVolume(bgmVolume);
+            setBgmStatus('음악을 반복 재생합니다. 재생이 막히면 재생 버튼을 누르세요.');
+            if (bgmPendingPlay) startBgm();
+          },
+          onStateChange: event => {
+            document.getElementById('bgm-play-toggle').textContent = event.data === YT.PlayerState.PLAYING ? '일시정지' : '재생';
+          },
+          onAutoplayBlocked: () => setBgmStatus('브라우저가 자동 재생을 막았습니다. 재생 버튼을 눌러 시작하세요.'),
+          onError: () => setBgmStatus('이 영상은 재생할 수 없습니다. 링크를 확인해 주세요.')
+        }
+      });
+    }
+    function applyBgmLink() {
+      const id = parseYoutubeVideoId(document.getElementById('bgm-url').value);
+      if (!id) { setBgmStatus('유효한 YouTube 영상 링크를 입력해 주세요.'); return; }
+      bgmVideoId = id;
+      bgmPendingPlay = true;
+      if (window.YT && YT.Player) createBgmPlayer();
+      else setBgmStatus('YouTube 플레이어를 불러오는 중입니다. 준비되면 재생을 시도합니다.');
+    }
+    function startBgm() {
+      if (!bgmPlayer || !bgmVideoId) { bgmPendingPlay = true; setBgmStatus('먼저 YouTube 링크를 적용해 주세요.'); return; }
+      bgmPendingPlay = false;
+      bgmPlayer.unMute();
+      bgmPlayer.setVolume(bgmVolume);
+      bgmPlayer.playVideo();
+    }
+    function toggleBgm() {
+      if (bgmPlayer && bgmPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+        bgmPendingPlay = false;
+        bgmPlayer.pauseVideo();
+      } else startBgm();
+    }
+    window.onYouTubeIframeAPIReady = () => { if (bgmVideoId) createBgmPlayer(); };
+    document.getElementById('bgm-apply').addEventListener('click', applyBgmLink);
+    document.getElementById('bgm-url').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); applyBgmLink(); } });
+    document.getElementById('bgm-play-toggle').addEventListener('click', toggleBgm);
+    document.getElementById('bgm-volume').addEventListener('input', e => {
+      bgmVolume = Number(e.target.value);
+      document.getElementById('bgm-volume-value').textContent = `${bgmVolume}%`;
+      if (bgmPlayer) bgmPlayer.setVolume(bgmVolume);
+    });
 
     function scalePreview() {
       const wrapper = document.getElementById('preview-wrapper');
@@ -629,8 +724,8 @@
       const fontStack = isMyeongjo ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
       screen.style.setProperty('--dialogue-font-family', fontStack);
       screen.style.setProperty('--dialogue-font-size', `${dialogueFontSize}px`);
-      screen.style.setProperty('--dialogue-letter-spacing', isMyeongjo ? '-0.01em' : 'normal');
-      screen.style.setProperty('--speaker-letter-spacing', isMyeongjo ? '-0.01em' : '1px');
+      screen.style.setProperty('--dialogue-letter-spacing', isMyeongjo ? '-0.03em' : 'normal');
+      screen.style.setProperty('--speaker-letter-spacing', isMyeongjo ? '-0.03em' : '1px');
       const standingContainer = document.getElementById('standing-container');
       standingContainer.classList.toggle('has-shadow', standingShadow);
       standingContainer.style.transform = `translate(${standingX}px, ${-standingY}px) scale(${standingSize / 100})`;
@@ -1005,6 +1100,7 @@
 
     document.getElementById('auto-play-btn').addEventListener('click', function(e) {
         e.stopPropagation();
+        if (bgmPlayer && bgmVideoId && bgmPlayer.getPlayerState() !== YT.PlayerState.PLAYING) startBgm();
         toggleAutoPlay();
     });
 
@@ -1130,6 +1226,7 @@
     });
 
     document.getElementById('preview-screen').addEventListener('click', function() {
+      if (bgmPlayer && bgmVideoId && bgmPlayer.getPlayerState() !== YT.PlayerState.PLAYING) startBgm();
       if (storyData.length === 0) return;
       if (isTyping) {
         clearInterval(typeInterval);
@@ -1168,10 +1265,12 @@
       const standingXValue = standingX;
       const dialogueFontFamilyValue = dialogueFont === 'myeongjo' ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
       const dialogueFontSizeValue = dialogueFontSize;
-      const dialogueLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.01em' : 'normal';
-      const speakerLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.01em' : '1px';
+      const dialogueLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.03em' : 'normal';
+      const speakerLetterSpacingValue = dialogueFont === 'myeongjo' ? '-0.03em' : '1px';
       const canvasWidthValue = canvasWidth;
       const canvasHeightValue = canvasHeight;
+      const bgmVideoIdValue = bgmVideoId;
+      const bgmVolumeValue = bgmVolume;
       
       const finalHTML = `<!DOCTYPE html>
 <html lang="ko">
@@ -1200,7 +1299,16 @@
       font-display: swap;
     }
     body { margin: 0; padding: 0; background-color: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'Noto Sans KR', sans-serif; }
-    #viewer-screen { width: ${canvasWidth}px; height: ${canvasHeight}px; background-color: #111; background-image: url('${bgBase64}'); background-size: contain; background-position: 50% 50%; background-repeat:no-repeat; position: relative; cursor: pointer; flex-shrink: 0; transform-origin: center center; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+    #viewer-layout { position:relative; flex-shrink:0; }
+    #viewer-screen { width: ${canvasWidth}px; height: ${canvasHeight}px; background-color: #111; background-image: url('${bgBase64}'); background-size: contain; background-position: 50% 50%; background-repeat:no-repeat; position: absolute; cursor: pointer; flex-shrink: 0; transform-origin: top left; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+    #replay-bgm { position:absolute; display:flex; flex-direction:column; gap:8px; width:220px; color:#fff; font:12px 'Noto Sans KR',sans-serif; }
+    #bgm-player { width:220px; height:200px; overflow:hidden; background:#000; }
+    #bgm-player iframe { display:block; max-width:100%; }
+    #replay-bgm-controls { display:flex; align-items:center; gap:7px; }
+    #replay-bgm-controls button { flex:0 0 auto; border:1px solid #555; border-radius:5px; background:#222; color:#fff; padding:5px 8px; cursor:pointer; }
+    #replay-bgm-controls input { min-width:0; flex:1; accent-color:#fff; }
+    #bgm-volume-value { color:#ccc; font-variant-numeric:tabular-nums; }
+    #bgm-status { margin:0; color:#ccc; font-size:10px; line-height:1.4; }
     #bottom-ui { position:absolute; top:0; left:0; transform:translateY(-100%); width:100%; display:flex; align-items:center; gap:15px; box-sizing:border-box; background:transparent; padding:12px 20px 14px; border-radius:0; z-index:20; cursor:default; opacity:0; pointer-events:none; transition:transform .25s ease,background-color .2s ease,opacity .6s ease; }
     #viewer-screen.has-started #bottom-ui { opacity:1; pointer-events:auto; }
     #bottom-ui.is-open { transform:translateY(0); }
@@ -1246,6 +1354,7 @@
   </style>
 </head>
 <body>
+  <div id="viewer-layout">
   <div id="viewer-screen" class="${theme === 'light' ? 'is-light' : ''}">
     <div id="standing-container" class="${standingShadowValue ? 'has-shadow' : ''}">
       <img id="character-img-1" class="standing-character" src="" alt="">
@@ -1268,16 +1377,59 @@
     </div>
     <div id="log-view" role="log" aria-label="이전 대화 로그"><div id="log-text"></div></div>
   </div>
+  ${bgmVideoIdValue ? '<aside id="replay-bgm" aria-label="배경 음악"><div id="bgm-player"></div><div id="replay-bgm-controls"><button type="button" id="bgm-play-toggle">재생</button><label for="bgm-volume">음량</label><input id="bgm-volume" type="range" min="0" max="100" value="' + bgmVolumeValue + '"><span id="bgm-volume-value">' + bgmVolumeValue + '%</span></div><p id="bgm-status">음악이 반복 재생됩니다. 재생이 막히면 재생 버튼을 누르세요.</p></aside>' : ''}
+  </div>
   <script>
     const canvasWidth = ${canvasWidthValue};
     const canvasHeight = ${canvasHeightValue};
+    const bgmVideoId = '${bgmVideoIdValue}';
+    const bgmVolume = ${bgmVolumeValue};
+    let bgmPlayer = null;
+    function startReplayBgm() {
+      if (!bgmPlayer) return;
+      bgmPlayer.unMute(); bgmPlayer.setVolume(bgmVolume); bgmPlayer.playVideo();
+    }
+    function onYouTubeIframeAPIReady() {
+      if (!bgmVideoId) return;
+      const playerVars={ autoplay:0, controls:1, loop:1, playlist:bgmVideoId, playsinline:1, rel:0 };
+      if (location.protocol !== 'file:' && location.origin !== 'null') playerVars.origin=location.origin;
+      bgmPlayer = new YT.Player('bgm-player', { width:'220', height:'200', videoId:bgmVideoId, playerVars, events:{
+        onReady:event => { event.target.setVolume(bgmVolume); },
+        onStateChange:event => { const button=document.getElementById('bgm-play-toggle'); if(button) button.textContent=event.data===YT.PlayerState.PLAYING?'일시정지':'재생'; },
+        onAutoplayBlocked:() => { const status=document.getElementById('bgm-status'); if(status) status.textContent='브라우저가 자동 재생을 막았습니다. 재생 버튼을 눌러 시작하세요.'; },
+        onError:() => { const status=document.getElementById('bgm-status'); if(status) status.textContent='이 YouTube 영상을 재생할 수 없습니다.'; }
+      }});
+    }
+    if (bgmVideoId) { const apiScript=document.createElement('script'); apiScript.src='https://www.youtube.com/iframe_api'; document.head.appendChild(apiScript); }
     function scaleScreen() {
       const screen = document.getElementById('viewer-screen');
-    const scale = Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight);
+      const layout = document.getElementById('viewer-layout');
+      const bgmPanel = document.getElementById('replay-bgm');
+      const extraWidth = bgmPanel ? 232 : 0;
+      const scale = Math.max(.1, Math.min(1, (window.innerWidth - extraWidth) / canvasWidth, window.innerHeight / canvasHeight));
+      const scaledWidth = canvasWidth * scale;
+      const scaledHeight = canvasHeight * scale;
+      const layoutHeight = Math.max(scaledHeight, bgmPanel ? 200 : 0);
+      layout.style.width = \`\${scaledWidth + extraWidth}px\`;
+      layout.style.height = \`\${layoutHeight}px\`;
+      screen.style.left = '0';
+      screen.style.top = \`\${(layoutHeight - scaledHeight) / 2}px\`;
       screen.style.transform = \`scale(\${scale})\`;
+      if (bgmPanel) { bgmPanel.style.left = \`\${scaledWidth + 12}px\`; bgmPanel.style.top = \`\${(layoutHeight - 200) / 2}px\`; }
     }
     window.addEventListener('resize', scaleScreen);
     scaleScreen();
+    const replayBgmToggle = document.getElementById('bgm-play-toggle');
+    if (replayBgmToggle) replayBgmToggle.addEventListener('click', e => {
+      e.stopPropagation();
+      if (bgmPlayer && bgmPlayer.getPlayerState() === YT.PlayerState.PLAYING) { bgmPlayer.pauseVideo(); replayBgmToggle.textContent='재생'; }
+      else startReplayBgm();
+    });
+    const replayBgmVolume = document.getElementById('bgm-volume');
+    if (replayBgmVolume) replayBgmVolume.addEventListener('input', e => {
+      const value=Number(e.target.value); document.getElementById('bgm-volume-value').textContent=\`\${value}%\`;
+      if (bgmPlayer) bgmPlayer.setVolume(value);
+    });
 
     const storyData = ${storyJson};
     function preloadReplayFonts() {
@@ -1498,6 +1650,7 @@
 
     document.getElementById('auto-play-btn').addEventListener('click', function(e) {
         e.stopPropagation();
+        if (bgmPlayer && bgmPlayer.getPlayerState() !== YT.PlayerState.PLAYING) startReplayBgm();
         toggleAutoPlay();
     });
 
@@ -1542,6 +1695,7 @@
     }, { passive:false });
 
     document.getElementById('viewer-screen').addEventListener('click', function() {
+      if (bgmPlayer && bgmPlayer.getPlayerState() !== YT.PlayerState.PLAYING) startReplayBgm();
       if (currentIndex === -1) { currentIndex = 0; renderScene(currentIndex); return; }
       if (isTyping) {
         clearInterval(typeInterval); 
@@ -1587,5 +1741,6 @@
       URL.revokeObjectURL(url);
     });
   </script>
+  <script src="https://www.youtube.com/iframe_api" async></script>
 </body>
 </html>
