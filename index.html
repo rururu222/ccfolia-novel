@@ -279,7 +279,7 @@
     .name-check-row input { width:16px; height:16px; accent-color:var(--accent); flex:0 0 auto; }
     .standing-lock-row { display:flex; align-items:center; justify-content:space-between; margin-top:10px; padding:8px 10px; border:1px solid var(--border); border-radius:6px; background:var(--bg-main); font-size:12px; }
     .standing-lock-row input { width:16px; height:16px; accent-color:var(--accent); }
-    .standing-lock-row.plain { padding:0 2px; border:none; background:none; }
+    .standing-lock-row.plain { padding:0; border:none; background:none; }
     .canvas-size-warning { display:none; margin:0; color:#e5534b; font-size:11px; line-height:1.4; }
     .character-position-list { display:flex; flex-direction:column; gap:4px; max-height:150px; overflow-y:auto; margin-top:7px; }
     .character-position-row { display:grid; grid-template-columns:44px minmax(0,160px); justify-content:space-between; align-items:center; gap:6px; padding:0 2px; font-size:11px; }
@@ -305,10 +305,10 @@
     .bg-range-pair label { display:flex; flex-direction:column; gap:3px; min-width:0; color:var(--text-muted); font-size:11px !important; }
     .bg-range-pair select { width:100%; min-width:0; max-width:100%; box-sizing:border-box; padding:4px 6px; padding-right:20px !important; background-position:right 5px center !important; font-size:11px; }
     .bg-range-controls > strong { font-size:12px !important; font-weight:600; }
-    .bg-range-settings { display:flex; flex-direction:column; gap:4px; padding:6px 2px 0; font-size:11px; }
+    .bg-range-settings { display:flex; flex-direction:column; gap:0; padding:6px 2px 0; font-size:11px; }
     .bg-range-settings input, .bg-base-adjust input { width:100%; min-width:0; accent-color:var(--accent); }
-    .bg-base-adjust { display:flex; flex-direction:column; gap:2px; min-width:0; padding:0; font-size:11px; }
-    .bg-base-control-group, .bg-range-control-group { display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .bg-base-adjust { display:flex; flex-direction:column; gap:0; min-width:0; padding:0; font-size:11px; }
+    .bg-base-control-group, .bg-range-control-group { display:flex; flex-direction:column; gap:0; min-width:0; }
     .bg-control-heading { display:flex; align-items:center; justify-content:space-between; min-height:20px; color:var(--text-main); font-size:12px; }
     .bg-base-location-inputs, .bg-range-location-inputs { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
     .bg-base-size-row, .bg-range-size-row { display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
@@ -323,8 +323,10 @@
     .range-control-row { display:flex; align-items:center; gap:6px; width:100%; min-width:0; box-sizing:border-box; }
     .range-control-row input[type="range"] { flex:1 1 0; min-width:0; width:0 !important; max-width:100%; box-sizing:border-box; accent-color:var(--accent); }
     .range-value { display:inline-block; flex:0 0 52px; width:52px; min-width:0; box-sizing:border-box; overflow:visible; text-align:right; white-space:nowrap; color:var(--text-muted); font-size:11px; font-variant-numeric:tabular-nums; }
-    .standing-global-controls { display:flex; flex-direction:column; gap:4px; min-width:0; }
-    .standing-global-controls > select { width:100%; min-width:0; box-sizing:border-box; margin-bottom:2px; }
+    .standing-global-controls { display:flex; flex-direction:column; gap:0; min-width:0; }
+    .standing-global-controls > .bg-control-heading { margin-bottom:4px; }
+    .standing-character-controls { margin-top:8px; }
+    .standing-global-controls > select { width:100%; min-width:0; box-sizing:border-box; margin-bottom:4px; }
     .standing-lock-row { cursor:pointer; }
     .bg-base-location-inputs > label + label, .bg-range-location-inputs > label + label, .standing-xy-inputs > label + label { margin-left:10px; }
     .standing-xy-inputs { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
@@ -332,7 +334,7 @@
     .standing-mini-control { min-width:0; display:grid; grid-template-columns:10px minmax(0,1fr) 34px; align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; font-size:11px; }
     .standing-mini-control input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
     .standing-mini-control .range-value { flex:none; width:34px; font-size:10px; }
-    .standing-gap-control { margin-top:4px; min-width:0; }
+    .standing-gap-control { margin-top:0; min-width:0; }
     .standing-gap-row { display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
     .standing-gap-slider { min-width:0; display:grid; grid-template-columns:auto minmax(0,1fr) 34px; align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; font-size:11px; }
     .standing-gap-slider input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
@@ -525,7 +527,7 @@
           <div class="standing-gap-control"><div class="standing-gap-row"><label class="standing-gap-slider"><span>간격</span><input id="standing-gap" type="range" min="-50" max="50" step="1" value="0"><small class="range-value" id="standing-gap-value">0%</small></label><button type="button" id="standing-gap-reset" class="bg-reset-icon" aria-label="간격 초기화" title="간격 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div></div>
         </div>
         <label class="standing-lock-row plain"><span>스탠딩 그림자</span><input id="standing-shadow" type="checkbox" checked></label>
-        <div class="standing-global-controls">
+        <div class="standing-global-controls standing-character-controls">
           <div class="bg-control-heading"><span>캐릭터별 조정</span><button type="button" id="character-standing-reset" class="bg-reset-icon" aria-label="선택한 캐릭터 조정 초기화" title="선택한 캐릭터 조정 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div>
           <select id="standing-character-select" aria-label="조정할 캐릭터"></select>
           <div class="standing-xy-inputs">
