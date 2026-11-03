@@ -147,6 +147,11 @@
     .setting-label { color:var(--text-muted); font-size:12px; white-space:nowrap; }
     .setting-hint { color:var(--text-muted); font-size:11px; line-height:1.5; }
     #character-position-controls { display:flex; flex-direction:column; gap:8px; }
+    #title-settings-controls { display:none; flex-direction:column; gap:8px; min-width:0; }
+    #title-settings-controls.is-open { display:flex; }
+    .title-field { display:flex; flex-direction:column; gap:4px; min-width:0; }
+    .title-field input[type="text"], .title-field textarea { width:100%; min-width:0; box-sizing:border-box; padding:6px 8px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-main); font-size:12px; font-family:inherit; resize:vertical; }
+    .title-field input[type="text"]:focus, .title-field textarea:focus { outline:none; border-color:var(--accent); }
     #character-position-list { margin-top:0; }
 
     /* 중앙 패널 (미리보기 래퍼) */
@@ -331,6 +336,7 @@
     .bg-base-location-inputs > label + label, .bg-range-location-inputs > label + label, .standing-xy-inputs > label + label { margin-left:10px; }
     .standing-xy-inputs { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
     .standing-size-row { display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
+    .title-spacing-control { grid-template-columns:auto minmax(0,1fr) 40px !important; }
     .standing-mini-control { min-width:0; display:grid; grid-template-columns:10px minmax(0,1fr) 34px; align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; font-size:11px; }
     .standing-mini-control input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
     .standing-mini-control .range-value { flex:none; width:34px; font-size:10px; }
@@ -411,6 +417,13 @@
     #next-arrow { position: absolute; bottom: 20px; right: 15%; font-size: 18px; color: #aaa; animation: blink 1.2s infinite; }
     #preview-screen { overflow:hidden; }
     #preview-screen.is-log-view #dialogue-box { opacity:0; visibility:hidden; }
+    #title-card { position:absolute; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(0,0,0,.78); color:#fff; text-align:center; font-family:'BookkMyungjo', serif; opacity:1; transition:opacity .6s ease; cursor:pointer; }
+    #title-card.is-visible { display:flex; }
+    #title-card.is-leaving { opacity:0; pointer-events:none; }
+    #title-rule { font-size:24px; letter-spacing:.32em; }
+    #title-main { width:80%; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
+    #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
+    #title-card [data-empty="true"] { display:none; }
     #log-view { font-family:var(--dialogue-font-family, 'Noto Sans KR', sans-serif); letter-spacing:var(--dialogue-letter-spacing, normal); display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
     #log-text .log-entry { margin-bottom:1em; }
     .spacing-neutral-punctuation { letter-spacing:normal; }
@@ -480,6 +493,16 @@
           </div>
           <audio id="bgm-audio" class="bgm-audio" loop preload="metadata"></audio>
           <p id="bgm-status" class="sr-only" role="status" aria-live="polite"></p>
+        </section>
+        <section class="settings-group">
+          <div class="sidebar-title">타이틀 화면</div>
+          <label class="standing-lock-row plain"><span>타이틀 화면 사용</span><input id="title-enabled" type="checkbox"></label>
+          <div id="title-settings-controls">
+            <label class="title-field"><span class="setting-label">룰 (상단)</span><input id="title-rule-input" type="text" placeholder="예: inSANe"></label>
+            <label class="title-field"><span class="setting-label">제목 (가운데)</span><textarea id="title-main-input" rows="2" placeholder="시나리오 제목"></textarea></label>
+            <label class="standing-mini-control title-spacing-control"><span>자간</span><input id="title-spacing" type="range" min="-0.1" max="0.5" step="0.01" value="0"><small class="range-value" id="title-spacing-value">0.00em</small></label>
+            <label class="title-field"><span class="setting-label">하단 문구</span><textarea id="title-credit-input" rows="2" placeholder="예: written by ..."></textarea></label>
+          </div>
         </section>
         <section class="settings-group">
           <div class="sidebar-title">화면 설정</div>
@@ -573,6 +596,7 @@
             <span id="page-indicator">0 / 0</span>
             <button id="controls-toggle" aria-label="진행도 창 열기" aria-expanded="false">▼</button>
           </div>
+          <div id="title-card" aria-label="타이틀 화면"><div id="title-rule" data-empty="true"></div><div id="title-main" data-empty="true"></div><div id="title-credit" data-empty="true"></div></div>
           <div id="log-view" role="log" aria-label="이전 대화 로그"><div id="log-text"></div></div>
         </div>
       </div>
@@ -586,6 +610,31 @@
     const baseBackgroundSettings = { x: 50, y: 50, zoom: 0 };
     let highResImageMap = {}; 
     let currentIndex = 0;
+    const titleSettings = { enabled: false, rule: '', title: '', credit: '', spacing: 0 };
+    let titleHideTimer = null;
+    function applyTitleText(root, settings) {
+      [['title-rule', settings.rule], ['title-main', settings.title], ['title-credit', settings.credit]].forEach(([id, text]) => {
+        const el = root.querySelector('#' + id); el.textContent = text; el.dataset.empty = String(!String(text).trim());
+      });
+      root.querySelector('#title-main').style.letterSpacing = settings.spacing + 'em';
+    }
+    function showPreviewTitle() {
+      const card = document.getElementById('title-card');
+      clearTimeout(titleHideTimer);
+      applyTitleText(card, titleSettings);
+      card.classList.remove('is-leaving');
+      card.classList.toggle('is-visible', titleSettings.enabled);
+    }
+    function isPreviewTitleShowing() {
+      const card = document.getElementById('title-card');
+      return card.classList.contains('is-visible') && !card.classList.contains('is-leaving');
+    }
+    function hidePreviewTitle() {
+      const card = document.getElementById('title-card');
+      card.classList.add('is-leaving');
+      clearTimeout(titleHideTimer);
+      titleHideTimer = setTimeout(() => { card.classList.remove('is-visible', 'is-leaving'); }, 600);
+    }
     let isTyping = false;
     let currentText = "";
     let typeInterval;
@@ -1322,8 +1371,23 @@
       if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); document.getElementById('preview-screen').click(); }
     });
 
+    document.getElementById('title-enabled').addEventListener('change', e => {
+      titleSettings.enabled = e.target.checked;
+      document.getElementById('title-settings-controls').classList.toggle('is-open', titleSettings.enabled);
+      showPreviewTitle();
+    });
+    [['title-rule-input', 'rule'], ['title-main-input', 'title'], ['title-credit-input', 'credit']].forEach(([id, key]) => {
+      document.getElementById(id).addEventListener('input', e => { titleSettings[key] = e.target.value; showPreviewTitle(); });
+    });
+    document.getElementById('title-spacing').addEventListener('input', e => {
+      titleSettings.spacing = Number(e.target.value);
+      document.getElementById('title-spacing-value').textContent = titleSettings.spacing.toFixed(2) + 'em';
+      showPreviewTitle();
+    });
+
     document.getElementById('preview-screen').addEventListener('click', function() {
       if (bgmDataUrl && bgmAudio.paused) startBgm();
+      if (isPreviewTitleShowing()) { hidePreviewTitle(); return; }
       if (storyData.length === 0) return;
       if (isTyping) {
         clearInterval(typeInterval);
@@ -1358,6 +1422,7 @@
       const characterStandingSettingsJson = JSON.stringify(characterStandingSettings);
       const characterPositionSettingsJson = JSON.stringify(characterPositionSettings);
       const standingGapValue = standingGap;
+      const titleSettingsJson = JSON.stringify(titleSettings).replace(/</g, '\\u003c');
       const standingShadowValue = standingShadow;
       const standingXValue = standingX;
       const dialogueFontFamilyValue = dialogueFont === 'myeongjo' ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
@@ -1445,6 +1510,13 @@
     #next-arrow { position: absolute; bottom: 20px; right: 15%; font-size: 18px; color: #aaa; animation: blink 1.2s infinite; }
     #viewer-screen { overflow:hidden; }
     #viewer-screen.is-log-view #dialogue-box { opacity:0; visibility:hidden; }
+    #title-card { position:absolute; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(0,0,0,.78); color:#fff; text-align:center; font-family:'BookkMyungjo', serif; opacity:1; transition:opacity .6s ease; cursor:pointer; }
+    #title-card.is-visible { display:flex; }
+    #title-card.is-leaving { opacity:0; pointer-events:none; }
+    #title-rule { font-size:24px; letter-spacing:.32em; }
+    #title-main { width:80%; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
+    #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
+    #title-card [data-empty="true"] { display:none; }
     #log-view { font-family: ${dialogueFontFamilyValue}; letter-spacing: ${dialogueLetterSpacingValue}; display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
     #log-text .log-entry { margin-bottom:1em; }
     .spacing-neutral-punctuation { letter-spacing:normal; }
@@ -1473,6 +1545,7 @@
       <span id="page-indicator">0 / 0</span>
       <button id="controls-toggle" aria-label="진행도 창 열기" aria-expanded="false">▼</button>
     </div>
+    <div id="title-card" aria-label="타이틀 화면"><div id="title-rule" data-empty="true"></div><div id="title-main" data-empty="true"></div><div id="title-credit" data-empty="true"></div></div>
     <div id="log-view" role="log" aria-label="이전 대화 로그"><div id="log-text"></div></div>
   </div>
   ${bgmDataUrl ? '<audio id="replay-bgm-audio" loop preload="auto" src="' + bgmDataUrl + '"></audio>' : ''}
@@ -1543,6 +1616,8 @@
     }, { passive:false });
 
     const storyData = ${storyJson};
+    const titleSettings = ${titleSettingsJson};
+    let isLeavingTitle = false;
     function preloadReplayFonts() {
       if (!document.fonts || !storyData.length) return;
       const glyphs = [...new Set(storyData.map(scene => String(scene.name || '') + String(scene.text || '')).join(''))].join('');
@@ -1807,7 +1882,16 @@
 
     document.getElementById('viewer-screen').addEventListener('click', function() {
       if (bgmAudio && bgmAudio.paused) startReplayBgm();
-      if (currentIndex === -1) { currentIndex = 0; renderScene(currentIndex); return; }
+      if (isLeavingTitle) return;
+      if (currentIndex === -1) {
+        const card = document.getElementById('title-card');
+        if (card.classList.contains('is-visible')) {
+          isLeavingTitle = true;
+          card.classList.add('is-leaving');
+          setTimeout(function() { card.classList.remove('is-visible'); isLeavingTitle = false; currentIndex = 0; renderScene(currentIndex); }, 600);
+        } else { currentIndex = 0; renderScene(currentIndex); }
+        return;
+      }
       if (isTyping) {
         clearInterval(typeInterval); 
         const dialogueTextBox = document.getElementById('dialogue-text');
@@ -1837,7 +1921,14 @@
       if (e.target.closest && e.target.closest('#bottom-ui')) return;
       if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); document.getElementById('viewer-screen').click(); }
     });
-    if (storyData.length) { currentIndex = 0; renderScene(currentIndex); }
+    if (titleSettings.enabled) {
+      const card = document.getElementById('title-card');
+      [['title-rule', titleSettings.rule], ['title-main', titleSettings.title], ['title-credit', titleSettings.credit]].forEach(function(pair) {
+        const el = document.getElementById(pair[0]); el.textContent = pair[1]; el.dataset.empty = String(!String(pair[1]).trim());
+      });
+      document.getElementById('title-main').style.letterSpacing = titleSettings.spacing + 'em';
+      card.classList.add('is-visible');
+    } else if (storyData.length) { currentIndex = 0; renderScene(currentIndex); }
   <\/script>
 </body>
 </html>`;
