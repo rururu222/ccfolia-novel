@@ -326,6 +326,7 @@
     .standing-global-controls { display:flex; flex-direction:column; gap:0; min-width:0; }
     .standing-global-controls > .bg-control-heading { margin-bottom:4px; }
     .standing-subsection { margin-top:8px; }
+    .standing-overall-controls { margin-top:-10px; }
     .standing-global-controls > select { width:100%; min-width:0; box-sizing:border-box; margin-bottom:4px; }
     .standing-lock-row { cursor:pointer; }
     .bg-base-location-inputs > label + label, .bg-range-location-inputs > label + label, .standing-xy-inputs > label + label { margin-left:10px; }
@@ -514,7 +515,7 @@
         <section class="settings-group">
         <div class="sidebar-title">스탠딩 설정</div>
         <label class="standing-lock-row plain"><span>스탠딩 그림자</span><input id="standing-shadow" type="checkbox" checked></label>
-        <div class="standing-global-controls standing-subsection">
+        <div class="standing-global-controls standing-overall-controls">
           <div class="bg-control-heading"><span>전체 조정</span></div>
           <div class="standing-xy-inputs">
             <label class="standing-mini-control"><span>X</span><input id="standing-x" type="range" min="-300" max="300" step="5" value="0"><small class="range-value" id="standing-x-value">0 px</small></label>
