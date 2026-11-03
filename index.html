@@ -447,12 +447,12 @@
     #next-arrow { position: absolute; bottom: 20px; right: 15%; font-size: 18px; color: #aaa; animation: blink 1.2s infinite; }
     #preview-screen { overflow:hidden; }
     #preview-screen.is-log-view #dialogue-box { opacity:0; visibility:hidden; }
-    #preview-screen.is-title-showing #bottom-ui { z-index:60; }
     #title-card { position:absolute; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(0,0,0,.78); color:#fff; text-align:center; font-family:'BookkMyungjo', serif; opacity:1; transition:opacity .6s ease; cursor:pointer; }
     #title-card.is-visible { display:flex; }
     #title-card.is-leaving { opacity:0; pointer-events:none; }
     #standing-container { transition:transform .2s ease, opacity .6s ease; }
     .is-title-showing #dialogue-box, .is-title-showing #standing-container { opacity:0; visibility:hidden; transition:none; }
+    .is-title-showing #bottom-ui { opacity:0 !important; visibility:hidden !important; pointer-events:none !important; transition:none !important; }
     #title-rule { font-size:24px; letter-spacing:.32em; }
     #title-main { width:80%; margin-top:8px; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
     #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
@@ -1741,6 +1741,7 @@
     #title-card.is-leaving { opacity:0; pointer-events:none; }
     #standing-container { transition:transform .2s ease, opacity .6s ease; }
     .is-title-showing #dialogue-box, .is-title-showing #standing-container { opacity:0; visibility:hidden; transition:none; }
+    .is-title-showing #bottom-ui { opacity:0 !important; visibility:hidden !important; pointer-events:none !important; transition:none !important; }
     #title-rule { font-size:24px; letter-spacing:.32em; }
     #title-main { width:80%; margin-top:8px; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
     #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
