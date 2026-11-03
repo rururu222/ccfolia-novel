@@ -1483,7 +1483,7 @@
       if (currentIndex < 0) return;
       const logText = document.getElementById('log-text');
       logText.replaceChildren();
-      storyData.slice(0, currentIndex + 1).forEach(scene => {
+      storyData.slice(0, currentIndex + 1).forEach((scene, index) => { if (hiddenLines.has(index)) return;
         const entry = document.createElement('div'); entry.className = 'log-entry';
         if (scene.name && scene.name !== '-') { const speaker = document.createElement('span'); speaker.textContent = `${scene.name}: `; speaker.style.color = scene.color; if (!narrationNames.includes(scene.name)) entry.appendChild(speaker); }
         appendDialogueText(entry, String(scene.text || ''));
