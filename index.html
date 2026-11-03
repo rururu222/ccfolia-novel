@@ -336,7 +336,7 @@
     .bg-base-location-inputs > label + label, .bg-range-location-inputs > label + label, .standing-xy-inputs > label + label { margin-left:10px; }
     .standing-xy-inputs { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
     .standing-size-row { display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
-    .title-spacing-control { grid-template-columns:auto minmax(0,1fr) 40px !important; }
+    .title-spacing-control { grid-template-columns:auto minmax(0,1fr) !important; }
     .standing-mini-control { min-width:0; display:grid; grid-template-columns:10px minmax(0,1fr) 34px; align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; font-size:11px; }
     .standing-mini-control input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
     .standing-mini-control .range-value { flex:none; width:34px; font-size:10px; }
@@ -417,10 +417,11 @@
     #next-arrow { position: absolute; bottom: 20px; right: 15%; font-size: 18px; color: #aaa; animation: blink 1.2s infinite; }
     #preview-screen { overflow:hidden; }
     #preview-screen.is-log-view #dialogue-box { opacity:0; visibility:hidden; }
+    #preview-screen.is-title-showing #bottom-ui { z-index:60; }
     #title-card { position:absolute; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(0,0,0,.78); color:#fff; text-align:center; font-family:'BookkMyungjo', serif; opacity:1; transition:opacity .6s ease; cursor:pointer; }
     #title-card.is-visible { display:flex; }
     #title-card.is-leaving { opacity:0; pointer-events:none; }
-    .is-title-showing #dialogue-box { opacity:0; visibility:hidden; transition:none; }
+    .is-title-showing #dialogue-box, .is-title-showing #standing-container { opacity:0; visibility:hidden; transition:none; }
     #title-rule { font-size:24px; letter-spacing:.32em; }
     #title-main { width:80%; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
     #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
@@ -501,7 +502,7 @@
           <div id="title-settings-controls">
             <label class="title-field"><span class="setting-label">룰 (상단)</span><input id="title-rule-input" type="text" placeholder="예: inSANe"></label>
             <label class="title-field"><span class="setting-label">제목 (가운데)</span><textarea id="title-main-input" rows="2" placeholder="시나리오 제목"></textarea></label>
-            <label class="standing-mini-control title-spacing-control"><span>자간</span><input id="title-spacing" type="range" min="-0.1" max="0.5" step="0.01" value="0"><small class="range-value" id="title-spacing-value">0.00em</small></label>
+            <label class="standing-mini-control title-spacing-control"><span>자간</span><input id="title-spacing" type="range" min="-0.1" max="0.5" step="0.01" value="0"></label>
             <label class="title-field"><span class="setting-label">하단 문구</span><textarea id="title-credit-input" rows="2" placeholder="예: written by ..."></textarea></label>
           </div>
         </section>
@@ -626,6 +627,13 @@
       card.classList.remove('is-leaving');
       card.classList.toggle('is-visible', titleSettings.enabled);
       document.getElementById('preview-screen').classList.toggle('is-title-showing', titleSettings.enabled);
+      if (titleSettings.enabled) {
+        clearInterval(typeInterval); clearTimeout(autoPlayTimeout); isTyping = false;
+        if (isAutoPlaying) toggleAutoPlay();
+        currentIndex = 0;
+        document.getElementById('progress-slider').value = 0;
+        if (storyData.length) document.getElementById('page-indicator').textContent = '0 / ' + storyData.length;
+      }
     }
     function isPreviewTitleShowing() {
       const card = document.getElementById('title-card');
@@ -1332,6 +1340,11 @@
     }
 
     document.getElementById('progress-slider').addEventListener('input', function(e) {
+      if (document.getElementById('title-card').classList.contains('is-visible')) {
+        clearTimeout(titleHideTimer);
+        document.getElementById('title-card').classList.remove('is-visible', 'is-leaving');
+        document.getElementById('preview-screen').classList.remove('is-title-showing');
+      }
       currentIndex = parseInt(e.target.value);
       clearInterval(typeInterval);
       clearTimeout(autoPlayTimeout);
@@ -1372,6 +1385,7 @@
       e.preventDefault(); if (e.deltaY < 0) openLogView(); else if (e.deltaY > 0) { closeLogView(); document.getElementById('preview-screen').click(); }
     }, { passive:false });
     document.addEventListener('keydown', e => {
+      if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
       if (document.getElementById('log-view').style.display === 'block') { if (e.key === 'Escape') closeLogView(); return; }
       if (e.target.closest && e.target.closest('#bottom-ui')) return;
       if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); document.getElementById('preview-screen').click(); }
@@ -1387,7 +1401,6 @@
     });
     document.getElementById('title-spacing').addEventListener('input', e => {
       titleSettings.spacing = Number(e.target.value);
-      document.getElementById('title-spacing-value').textContent = titleSettings.spacing.toFixed(2) + 'em';
       showPreviewTitle();
     });
 
@@ -1519,7 +1532,7 @@
     #title-card { position:absolute; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(0,0,0,.78); color:#fff; text-align:center; font-family:'BookkMyungjo', serif; opacity:1; transition:opacity .6s ease; cursor:pointer; }
     #title-card.is-visible { display:flex; }
     #title-card.is-leaving { opacity:0; pointer-events:none; }
-    .is-title-showing #dialogue-box { opacity:0; visibility:hidden; transition:none; }
+    .is-title-showing #dialogue-box, .is-title-showing #standing-container { opacity:0; visibility:hidden; transition:none; }
     #title-rule { font-size:24px; letter-spacing:.32em; }
     #title-main { width:80%; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
     #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
