@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코코포 비주얼노벨풍 백업기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+    @font-face {
+      font-family: 'BookkMyungjo';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Lt.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'BookkMyungjo';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Bd.woff2') format('woff2');
+      font-weight: 700 800;
+      font-style: normal;
+      font-display: swap;
+    }
+    :root {
+      --bg-main: #18181b;
+      --bg-panel: #27272a;
+      --accent: #d4d4d8;
+      --accent-hover: #fafafa;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --border: #3f3f46;
+      --success: #10b981;
+      --space-ui: 16px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+      letter-spacing: -0.01em;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* 상단 헤더 */
+    .app-header {
+      width: 100%;
+      padding: 15px 40px;
+      background-color: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 50;
+    }
+    .app-header h1 { margin: 0; font-size: 18px; font-weight: 700; color: var(--text-main); letter-spacing: -.02em; }
+    button, input, select, textarea { font-family: inherit; letter-spacing: inherit; }
+    button:focus-visible, select:focus-visible, input:focus-visible, label:focus-within > input[type="checkbox"] { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .upload-btn:focus-within, .bg-upload-tile:focus-within { border-color: var(--accent); }
+
+    /* 메인 레이아웃 */
+    .app-container {
+      display: flex;
+      width: 100%;
+      max-width: 1800px;
+      height: calc(100vh - 65px);
+      padding: 20px;
+      gap: 16px;
+      box-sizing: border-box;
+    }
+
+    /* 좌측 패널 (컨트롤 박스) */
+    .sidebar {
+      flex: 0 0 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background-color: var(--bg-panel);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow-y: auto;
+    }
+    .sidebar::-webkit-scrollbar, .name-check-list::-webkit-scrollbar, .character-position-list::-webkit-scrollbar { width: 6px; }
+    .sidebar::-webkit-scrollbar-track, .name-check-list::-webkit-scrollbar-track, .character-position-list::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb, .name-check-list::-webkit-scrollbar-thumb, .character-position-list::-webkit-scrollbar-thumb { background: #52525b; border-radius: 3px; }
+    .sidebar-title { font-size: 13px; color: var(--text-main); margin-bottom: 4px; font-weight: 600; letter-spacing: -.01em; }
+    .sidebar select { padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); background-color: var(--bg-main); font-size: 12px; cursor: pointer; transition: border-color .15s; }
+    .sidebar select:hover { border-color: #71717a; }
+    .resource-step-title { color:var(--text-main); font-size:13px; font-weight:400; line-height:normal; }
+    .upload-btn .resource-step-title, .resource-step-box > .resource-step-title, .bgm-heading-row > .resource-step-title { font-family:inherit; font-size:13px; font-weight:400; line-height:1.2; }
+
+    .upload-btn {
+      display: flex; justify-content: space-between; align-items: center; padding: 12px 15px;
+      background-color: var(--bg-main); color: var(--text-main); font-size: 14px;
+      border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.2s;
+    }
+    .upload-btn:hover { border-color: #71717a; background-color: #202023; }
+    .upload-btn input { display: none; }
+    
+    .status-icon { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background-color: #52525b; transition: background-color .2s, box-shadow .2s; }
+    .status-icon.done { background-color: var(--success); box-shadow: 0 0 8px var(--success); }
+    .divider { height: 1px; background-color: var(--border); margin: 5px 0; flex-shrink: 0; }
+
+    .download-btn {
+      margin-top: auto; padding: 13px 15px; background-color: var(--accent); color: #18181b;
+      font-size: 15px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; flex-shrink: 0;
+      transition: 0.2s;
+    }
+    .download-btn:hover:not(:disabled) { background-color: var(--accent-hover); }
+    .download-btn:disabled { background-color: var(--border); color: #777; cursor: not-allowed; }
+
+    /* 커스텀 설정 영역 */
+    .color-setting-box {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 8px 12px; 
+      background-color: var(--bg-main); 
+      border: 1px solid var(--border); 
+      border-radius: 6px;
+    }
+    .color-setting-box select { padding-top: 5px; padding-bottom: 5px; }
+    #custom-ui-panel { display:flex; flex-direction:column; gap:var(--space-ui); margin-top:8px; padding:16px 0; border-top:1px solid var(--border); line-height:1.45; font-size:12px; }
+    #custom-ui-panel > * { margin-top:0 !important; margin-bottom:0 !important; }
+    #custom-ui-panel .sidebar-title { line-height:1.45; }
+    #custom-ui-panel .standing-lock-row { margin:0; }
+    .settings-group { display:flex; flex-direction:column; gap:10px; min-width:0; }
+    .settings-group + .settings-group { padding-top:var(--space-ui); border-top:1px solid var(--border); }
+    .settings-group > .sidebar-title { margin:0; }
+    .setting-row { display:grid; grid-template-columns:64px minmax(0,1fr); align-items:center; gap:8px; min-width:0; }
+    .setting-row select { width:100%; min-width:0; box-sizing:border-box; }
+    .setting-offset { grid-column:2; }
+    .setting-pair { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6px; min-width:0; }
+    .setting-field { display:flex; flex-direction:column; gap:6px; min-width:0; }
+    .setting-label { color:var(--text-muted); font-size:12px; white-space:nowrap; }
+    .setting-hint { color:var(--text-muted); font-size:11px; line-height:1.5; }
+    #character-position-controls { display:flex; flex-direction:column; gap:8px; }
+    #character-position-list { margin-top:0; }
+
+    /* 중앙 패널 (미리보기 래퍼) */
+    .preview-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-panel);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .preview-wrapper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background-color: var(--bg-main);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* 미리보기 캔버스 */
+    #preview-screen {
+      width: 1200px;
+      height: 900px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      background-color: #000;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transform-origin: center center;
+    }
+    
+    /* 하단 가로 진행도 UI */
+    #bottom-ui {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translateY(-100%);
+      width: 100%;
+      display: none;
+      align-items: center;
+      gap: 15px;
+      box-sizing: border-box;
+      background: transparent;
+      padding: 12px 20px 14px;
+      border-radius: 0;
+      z-index: 20;
+      cursor: default;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.25s ease, background-color 0.2s ease, opacity 0.6s ease;
+    }
+    #preview-screen.has-started #bottom-ui { display:flex !important; opacity:1; pointer-events:auto; }
+    #bottom-ui.is-open { transform: translateY(0); }
+    #bottom-ui:hover, #bottom-ui.is-open { background-color: rgba(20,20,20,.85); }
+    #controls-toggle { position:absolute; bottom:-38px; left:50%; transform:translate(-50%,0); width:64px; height:30px; border:0; border-radius:0 0 10px 10px; color:white; background:transparent; cursor:pointer; font-size:16px; transition:transform .2s ease; }
+    #bottom-ui:hover #controls-toggle { transform:translate(-50%,4px); }
+    #bottom-ui.is-open #controls-toggle:hover { transform:translate(-50%,-4px); }
+    
+    #auto-play-btn {
+      position: relative;
+      background: transparent;
+      color: white;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      text-align: center;
+      font-size: 0;
+      transition: opacity .2s;
+    }
+    #auto-play-btn::before { content:""; position:absolute; left:50%; top:50%; transform:translate(-66.667%,-50%); width:0; height:0; border-top:7px solid transparent; border-bottom:7px solid transparent; border-left:10px solid #fff; }
+    #auto-play-btn.is-playing::before { width:10px; height:10px; transform:translate(-50%,-50%); border:0; background:#fff; }
+    #auto-play-btn:hover { opacity:.75; }
+    
+    #progress-slider {
+      flex: 1;
+      cursor: pointer;
+      accent-color: #fff;
+      background: transparent;
+      height:20px;
+      appearance:none;
+      -webkit-appearance:none;
+    }
+    #progress-slider::-webkit-slider-runnable-track { height:4px; border-radius:999px; background:rgba(255,255,255,.35); }
+    #progress-slider::-moz-range-track { height:4px; border-radius:999px; background:rgba(255,255,255,.35); }
+    #progress-slider::-webkit-slider-thumb { width:14px; height:14px; margin-top:-5px; border:0; border-radius:50%; background:#fff; appearance:none; -webkit-appearance:none; }
+    #progress-slider::-moz-range-thumb { width:14px; height:14px; border:0; border-radius:50%; background:#fff; }
+    #page-indicator {
+      font-size: 15px;
+      font-weight: bold;
+      color: #ccc;
+      min-width: 60px;
+      text-align: right;
+    }
+
+    /* 캐릭터 이미지 - 그림자 수정됨 */
+    .standing-character {
+      position: absolute;
+      bottom: 0px;
+      height: 850px;
+      width: auto;
+      left: 50%;
+      transform-origin: bottom center;
+      filter: none;
+      transition: none;
+      z-index: 5;
+      display: none;
+      transform:translateX(-50%);
+    }
+    #standing-container.has-shadow .standing-character { filter:drop-shadow(0 5px 10px rgba(0,0,0,.2)); }
+    .standing-character.is-dimmed { filter:brightness(.55); }
+    #standing-container.has-shadow .standing-character.is-dimmed { filter:brightness(.55) drop-shadow(0 5px 15px rgba(0,0,0,.3)); }
+    #standing-container.instant-shadow-change .standing-character { transition:none !important; }
+    #standing-container { position:absolute; inset:0; pointer-events:none; transform:translateY(0) scale(1); transform-origin:bottom center; transition:transform .2s ease; z-index:5; }
+    .name-check-list { display:flex; flex-direction:column; gap:4px; max-height:88px; overflow-y:auto; padding:5px; border:1px solid var(--border); border-radius:6px; background:var(--bg-main); }
+    .name-check-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 6px; border-radius:4px; font-size:12px; cursor:pointer; }
+    .name-check-row:hover { background:var(--bg-panel); }
+    .name-check-row input { width:16px; height:16px; accent-color:var(--accent); flex:0 0 auto; }
+    .standing-lock-row { display:flex; align-items:center; justify-content:space-between; margin-top:10px; padding:8px 10px; border:1px solid var(--border); border-radius:6px; background:var(--bg-main); font-size:12px; }
+    .standing-lock-row input { width:16px; height:16px; accent-color:var(--accent); }
+    .standing-lock-row.plain { padding:0 2px; border:none; background:none; }
+    .canvas-size-warning { display:none; margin:0; color:#e5534b; font-size:11px; line-height:1.4; }
+    .character-position-list { display:flex; flex-direction:column; gap:4px; max-height:150px; overflow-y:auto; margin-top:7px; }
+    .character-position-row { display:grid; grid-template-columns:44px minmax(0,160px); justify-content:space-between; align-items:center; gap:6px; padding:0 2px; font-size:11px; }
+    .character-position-row span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .character-position-row select { width:100%; min-width:0; box-sizing:border-box; padding:4px 6px; font-size:11px; }
+
+    .background-settings-box { display:flex; flex-direction:column; gap:9px; padding:12px 15px; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); min-width:0; }
+    .background-settings-box.resource-step-box { padding:12px 15px; }
+    .bg-base-row { display:grid; grid-template-columns:52px minmax(0,1fr); gap:10px; align-items:center; min-width:0; }
+    .bg-upload-tile { width:52px; height:52px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); color:var(--text-main); cursor:pointer; box-sizing:border-box; }
+    .bg-upload-tile input { display:none; }
+    .bg-upload-tile svg { width:22px; height:22px; z-index:1; }
+    .bg-upload-tile img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none; }
+    .bg-upload-tile.has-image img { display:block; }
+    .bg-upload-tile.has-image svg { display:none; }
+    .bg-range-card { position:relative; display:grid; grid-template-columns:52px minmax(0,1fr); gap:9px; padding:9px; border:1px solid var(--border); border-radius:8px; background:var(--bg-main); min-width:0; box-sizing:border-box; }
+    .bg-range-controls { display:flex; flex-direction:column; gap:6px; min-width:0; }
+    .bg-range-controls > strong { padding-right:24px; }
+    .bg-range-card > .bg-range-settings { grid-column:1/-1; }
+    .remove-bg { position:absolute; top:5px; right:5px; width:22px; height:22px; display:flex; align-items:center; justify-content:center; padding:0; border:0; border-radius:5px; color:var(--text-muted); background:transparent; cursor:pointer; }
+    .remove-bg:hover { color:var(--text-main); background:var(--bg-panel); }
+    .bg-range-pair { display:grid; grid-template-columns:1fr 1fr; gap:6px; min-width:0; }
+    .bg-range-pair label { display:flex; flex-direction:column; gap:3px; min-width:0; color:var(--text-muted); font-size:11px !important; }
+    .bg-range-pair select { width:100%; min-width:0; max-width:100%; box-sizing:border-box; padding:4px 6px; padding-right:20px !important; background-position:right 5px center !important; font-size:11px; }
+    .bg-range-controls > strong { font-size:12px !important; font-weight:600; }
+    .bg-range-settings { display:flex; flex-direction:column; gap:4px; padding:6px 2px 0; font-size:11px; }
+    .bg-range-settings input, .bg-base-adjust input { width:100%; min-width:0; accent-color:var(--accent); }
+    .bg-base-adjust { display:flex; flex-direction:column; gap:2px; min-width:0; padding:0; font-size:11px; }
+    .bg-base-control-group, .bg-range-control-group { display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .bg-control-heading { display:flex; align-items:center; justify-content:space-between; min-height:20px; color:var(--text-main); font-size:12px; }
+    .bg-base-location-inputs, .bg-range-location-inputs { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
+    .bg-base-size-row, .bg-range-size-row { display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
+    .bg-reset-icon { width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; padding:0; border:0; border-radius:0; color:var(--text-muted); background:transparent; cursor:pointer; }
+    .bg-reset-icon svg { width:13px; height:13px; }
+    .bg-reset-icon:hover { color:var(--text-main); background:transparent; }
+    .scene-bg-notice { margin:0; color:#dc2626; font-size:11px; line-height:1.4; }
+    .bg-mini-control { min-width:0; display:grid; grid-template-columns:10px minmax(0,1fr); align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; }
+    .bg-mini-control.bg-size-control { grid-template-columns:10px minmax(0,1fr); }
+    .bg-mini-control input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
+    .bg-mini-control .range-value { display:none; }
+    .range-control-row { display:flex; align-items:center; gap:6px; width:100%; min-width:0; box-sizing:border-box; }
+    .range-control-row input[type="range"] { flex:1 1 0; min-width:0; width:0 !important; max-width:100%; box-sizing:border-box; accent-color:var(--accent); }
+    .range-value { display:inline-block; flex:0 0 52px; width:52px; min-width:0; box-sizing:border-box; overflow:visible; text-align:right; white-space:nowrap; color:var(--text-muted); font-size:11px; font-variant-numeric:tabular-nums; }
+    .standing-global-controls { display:flex; flex-direction:column; gap:4px; min-width:0; }
+    .standing-global-controls > select { width:100%; min-width:0; box-sizing:border-box; margin-bottom:2px; }
+    .standing-lock-row { cursor:pointer; }
+    .bg-base-location-inputs > label + label, .bg-range-location-inputs > label + label, .standing-xy-inputs > label + label { margin-left:10px; }
+    .standing-xy-inputs { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
+    .standing-size-row { display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
+    .standing-mini-control { min-width:0; display:grid; grid-template-columns:10px minmax(0,1fr) 34px; align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; font-size:11px; }
+    .standing-mini-control input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
+    .standing-mini-control .range-value { flex:none; width:34px; font-size:10px; }
+    .standing-gap-control { margin-top:4px; min-width:0; }
+    .standing-gap-row { display:grid; grid-template-columns:minmax(0,1fr) 22px; gap:4px; min-width:0; align-items:center; }
+    .standing-gap-slider { min-width:0; display:grid; grid-template-columns:auto minmax(0,1fr) 34px; align-items:center; gap:5px; padding:3px 2px; box-sizing:border-box; font-size:11px; }
+    .standing-gap-slider input[type="range"] { width:100%; min-width:0; accent-color:var(--accent); }
+    .standing-gap-slider .range-value { flex:none; width:34px; font-size:10px; }
+    .bgm-icon-btn { width:18px; height:16px; display:inline-flex; align-items:center; justify-content:center; padding:0; border:0; outline:0; box-shadow:none; background:transparent; color:var(--text-main); cursor:pointer; }
+    .bgm-icon-btn svg { width:14px; height:14px; fill:currentColor; stroke:currentColor; }
+    .bgm-volume-icon { display:block; width:16px; height:16px; color:var(--text-muted); }
+    .font-setting-row { display:grid; grid-template-columns:40px minmax(0,1fr) minmax(0,1fr); align-items:center; gap:6px; min-width:0; font-size:12px; }
+    .canvas-size-fields { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px; min-width:0; }
+    .canvas-size-field { display:flex; align-items:center; gap:5px; min-width:0; color:var(--text-muted); font-size:11px; }
+    .canvas-size-field > span { flex:0 0 auto; }
+    .canvas-size-field input { flex:1 1 0; width:0; min-width:0; box-sizing:border-box; padding:6px 8px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-main); font-size:12px; font-variant-numeric:tabular-nums; }
+    .canvas-size-field small { flex:0 0 auto; color:var(--text-muted); font-size:10px; }
+    .font-setting-row select { width:100%; min-width:0; box-sizing:border-box; padding:7px 10px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background-color:var(--bg-main); font-size:12px; }
+    select { appearance:none; -webkit-appearance:none; padding-right:30px !important; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='m3 4.5 3 3 3-3' stroke='%23a1a1aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important; background-repeat:no-repeat !important; background-position:right 10px center !important; background-size:12px 12px !important; }
+    .bgm-settings { display:flex; flex-direction:column; gap:10px; min-width:0; }
+    .bgm-file-row { display:grid; grid-template-columns:24px minmax(0,1fr); align-items:center; gap:7px; min-width:0; }
+    .bgm-volume-row { display:grid; grid-template-columns:24px 16px minmax(0,1fr); align-items:center; gap:7px; min-width:0; }
+    .bgm-upload-btn { width:24px; height:24px; display:flex; align-items:center; justify-content:center; border:0; border-radius:0; background:transparent; color:var(--text-main); cursor:pointer; }
+    .bgm-upload-btn svg { width:18px; height:18px; }
+    .bgm-upload-btn input { display:none; }
+    .bgm-file-name { min-width:0; overflow:hidden; color:var(--text-muted); font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+    .bgm-volume-slider { display:block; width:100%; min-width:0; height:18px; margin:0; accent-color:var(--accent); }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    .bgm-audio { display:none; }
+
+    /* 하단 대화창 */
+    #dialogue-box {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 220px;
+      background: linear-gradient(to top, rgba(0,0,0,1) 0, rgba(20,20,20,0.8) 100px, rgba(20,20,20,0) 100%);
+      border-radius: 0;
+      border: 0;
+      padding: 40px 0;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      z-index: 10;
+      box-shadow: none;
+      opacity: 0;
+      transition: background 0.3s ease, opacity 0.6s ease;
+    }
+    #dialogue-box.is-visible { opacity:1; }
+    #dialogue-content { width: 70%; height: 100%; display: flex; flex-direction: column; gap: 12px; }
+    #preview-screen.is-light #dialogue-box { background: linear-gradient(to top, rgba(255,255,255,1) 0, rgba(245,245,245,0.88) 100px, rgba(245,245,245,0) 100%); color: #111; }
+    #preview-screen.is-light #speaker-name { text-shadow: none; }
+    #preview-screen.is-light #dialogue-text { color: #222 !important; }
+    #preview-screen.is-light #next-arrow { color: #555; }
+    #speaker-name { font-family:var(--dialogue-font-family, 'Noto Sans KR', sans-serif); font-size: 20px; font-weight: 800; letter-spacing:var(--speaker-letter-spacing, 1px); text-shadow: 1px 1px 2px rgba(0,0,0,0.8); color: #fff; }
+    
+    /* 대화 텍스트 */
+    #dialogue-text { 
+      font-family:var(--dialogue-font-family, 'Noto Sans KR', sans-serif);
+      font-size: var(--dialogue-font-size, 20px);
+      letter-spacing:var(--dialogue-letter-spacing, normal);
+      line-height: 1.6; 
+      white-space: pre-wrap; 
+      word-break: keep-all; 
+      color: #eaeaea; 
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto; 
+      padding-right: 10px;
+    }
+    #dialogue-text::-webkit-scrollbar { width: 6px; }
+    #dialogue-text::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
+
+    #next-arrow { position: absolute; bottom: 20px; right: 15%; font-size: 18px; color: #aaa; animation: blink 1.2s infinite; }
+    #preview-screen { overflow:hidden; }
+    #preview-screen.is-log-view #dialogue-box { opacity:0; visibility:hidden; }
+    #log-view { font-family:var(--dialogue-font-family, 'Noto Sans KR', sans-serif); letter-spacing:var(--dialogue-letter-spacing, normal); display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
+    #log-text .log-entry { margin-bottom:1em; }
+    .spacing-neutral-punctuation { letter-spacing:normal; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <h1>코코포 비주얼노벨풍 백업기</h1>
+    <span style="font-size:12px; line-height:1.5; text-align:right; color:var(--text-muted);">original @2486_zip<br>edited @dabiCM__</span>
+  </header>
+
+  <div class="app-container">
+    <div class="sidebar">
+      <div class="sidebar-title">기본 리소스</div>
+      <label class="upload-btn" id="lbl-html">
+        <span class="resource-step-title">1. HTML 로그 업로드</span>
+        <div class="status-icon" id="icon-html"></div>
+        <input type="file" id="html-upload" accept=".html">
+      </label>
+      <label class="upload-btn" id="lbl-json">
+        <span class="resource-step-title">2. JSON 파일 업로드</span>
+        <div class="status-icon" id="icon-json"></div>
+        <input type="file" id="json-upload" accept=".json">
+      </label>
+      <section class="background-settings-box resource-step-box">
+        <div class="sidebar-title resource-step-title" style="margin:0;">3. 배경 이미지 설정</div>
+        <div class="bg-base-row">
+          <label class="bg-upload-tile" id="lbl-bg" title="배경 이미지 업로드" aria-label="배경 이미지 업로드">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg>
+            <img id="bg-upload-thumb" alt="배경 이미지 미리보기">
+            <input type="file" id="bg-upload" accept="image/*">
+          </label>
+          <div class="bg-base-adjust">
+            <div class="bg-base-control-group">
+              <div class="bg-base-location-inputs">
+                <label class="bg-mini-control"><span>X</span><input id="base-bg-x" type="range" min="0" max="100" value="50"><small class="range-value" id="base-bg-x-value">50%</small></label>
+                <label class="bg-mini-control"><span>Y</span><input id="base-bg-y" type="range" min="0" max="100" value="50"><small class="range-value" id="base-bg-y-value">50%</small></label>
+                <button type="button" id="base-bg-position-reset" class="bg-reset-icon" aria-label="위치 초기화" title="위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+              </div>
+            </div>
+            <div class="bg-base-control-group">
+              <div class="bg-base-size-row">
+                <label class="bg-mini-control bg-size-control"><span>S</span><input id="base-bg-zoom" type="range" min="-50" max="50" value="0"><small class="range-value" id="base-bg-zoom-value">0%</small></label>
+                <button type="button" id="base-bg-size-reset" class="bg-reset-icon" aria-label="크기 초기화" title="크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="scene-bg-list" style="display:flex; flex-direction:column; gap:8px; min-width:0;">
+          <button class="upload-btn" id="add-scene-bg" type="button" aria-disabled="true" style="justify-content:center; opacity:.55; padding:9px; cursor:not-allowed;">＋ 구간별 배경 이미지 추가</button>
+        </div>
+        <p id="scene-bg-notice" class="scene-bg-notice" role="status" style="display:none;"></p>
+      </section>
+      <div id="custom-ui-panel" style="display: none;">
+        <section class="settings-group bgm-settings">
+          <div class="sidebar-title">BGM</div>
+          <div class="bgm-file-row">
+            <label class="bgm-upload-btn" title="배경 음악 업로드" aria-label="배경 음악 업로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg><input type="file" id="bgm-upload" accept="audio/*"></label>
+            <span id="bgm-file-name" class="bgm-file-name">선택된 파일 없음</span>
+          </div>
+          <div class="bgm-volume-row">
+            <button type="button" id="bgm-play-toggle" class="bgm-icon-btn" aria-label="재생" title="재생"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg></button>
+            <svg class="bgm-volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M16 9a5 5 0 0 1 0 6m2.5-8.5a8.5 8.5 0 0 1 0 11"/></svg>
+            <input id="bgm-volume" class="bgm-volume-slider" type="range" min="0" max="100" value="35" aria-label="배경 음악 음량" title="음량">
+          </div>
+          <audio id="bgm-audio" class="bgm-audio" loop preload="metadata"></audio>
+          <p id="bgm-status" class="sr-only" role="status" aria-live="polite"></p>
+        </section>
+        <section class="settings-group">
+          <div class="sidebar-title">화면 설정</div>
+          <label class="setting-row"><span class="setting-label">화면 크기</span>
+            <select id="canvas-preset">
+              <option value="1200x900">4:3 (1200 × 900)</option>
+              <option value="1600x900">16:9 (1600 × 900)</option>
+            </select>
+          </label>
+          <div class="setting-row">
+            <div class="canvas-size-fields setting-offset">
+              <label class="canvas-size-field"><span>가로</span><input id="canvas-width" type="number" min="400" max="3000" step="1" value="1200" aria-label="화면 가로 크기"><small>px</small></label>
+              <label class="canvas-size-field"><span>세로</span><input id="canvas-height" type="number" min="400" max="3000" step="1" value="900" aria-label="화면 세로 크기"><small>px</small></label>
+            </div>
+            <p id="canvas-size-warning" class="canvas-size-warning setting-offset" role="alert"></p>
+          </div>
+          <label class="setting-row"><span class="setting-label">화면 분할</span>
+            <select id="standing-division"><option value="2">2분할 (최대 2명)</option><option value="4">4분할 (최대 4명)</option></select>
+          </label>
+          <label class="standing-lock-row plain"><span>캐릭터 위치 고정</span><input id="standing-position-lock" type="checkbox"></label>
+          <div id="character-position-controls" style="display:none;">
+            <div id="character-position-list" class="character-position-list"></div>
+          </div>
+        </section>
+
+        <section class="settings-group">
+          <div class="sidebar-title">대화창 설정</div>
+          <label class="setting-row"><span class="setting-label">모드</span><select id="theme-select"><option value="dark">블랙 모드</option><option value="light">화이트 모드</option></select></label>
+          <div class="setting-row"><span class="setting-label">폰트</span><div class="setting-pair"><select id="dialogue-font-select" aria-label="폰트 종류"><option value="gothic">고딕</option><option value="myeongjo">명조</option></select><select id="dialogue-font-size" aria-label="폰트 크기"><option value="14">14 px</option><option value="16">16 px</option><option value="18">18 px</option><option value="20" selected>20 px</option><option value="22">22 px</option><option value="24">24 px</option><option value="26">26 px</option></select></div></div>
+          <div class="setting-field"><span class="setting-label">나레이션 저널</span>
+            <div id="narration-name-list" class="name-check-list" role="group" aria-label="나레이션 캐릭터"></div>
+          </div>
+        </section>
+
+        <section class="settings-group">
+        <div class="sidebar-title">스탠딩 설정</div>
+        <div class="standing-global-controls">
+          <div class="bg-control-heading"><span>전체 조정</span></div>
+          <div class="standing-xy-inputs">
+            <label class="standing-mini-control"><span>X</span><input id="standing-x" type="range" min="-300" max="300" step="5" value="0"><small class="range-value" id="standing-x-value">0 px</small></label>
+            <label class="standing-mini-control"><span>Y</span><input id="standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="standing-y-value">0 px</small></label>
+            <button type="button" id="standing-position-reset" class="bg-reset-icon" aria-label="스탠딩 위치 초기화" title="스탠딩 위치 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+          </div>
+          <div class="standing-size-row">
+            <label class="standing-mini-control"><span>S</span><input id="standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="standing-size-value">100%</small></label>
+            <button type="button" id="standing-size-reset" class="bg-reset-icon" aria-label="스탠딩 크기 초기화" title="스탠딩 크기 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+          </div>
+          <div class="standing-gap-control"><div class="standing-gap-row"><label class="standing-gap-slider"><span>간격</span><input id="standing-gap" type="range" min="-50" max="50" step="1" value="0"><small class="range-value" id="standing-gap-value">0%</small></label><button type="button" id="standing-gap-reset" class="bg-reset-icon" aria-label="간격 초기화" title="간격 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div></div>
+        </div>
+        <label class="standing-lock-row plain"><span>스탠딩 그림자</span><input id="standing-shadow" type="checkbox" checked></label>
+        <div class="standing-global-controls">
+          <div class="bg-control-heading"><span>캐릭터별 조정</span><button type="button" id="character-standing-reset" class="bg-reset-icon" aria-label="선택한 캐릭터 조정 초기화" title="선택한 캐릭터 조정 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div>
+          <select id="standing-character-select" aria-label="조정할 캐릭터"></select>
+          <div class="standing-xy-inputs">
+            <label class="standing-mini-control"><span>X</span><input id="character-standing-x" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-x-value">0 px</small></label>
+            <label class="standing-mini-control"><span>Y</span><input id="character-standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-y-value">0 px</small></label>
+          </div>
+          <div class="standing-size-row">
+            <label class="standing-mini-control"><span>S</span><input id="character-standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="character-standing-size-value">100%</small></label>
+          </div>
+        </div>
+        </section>
+      </div>
+      <!-- ㅇ -->
+
+      <button class="download-btn" id="download-btn" disabled style="margin-top: auto;">웹 뷰어 다운로드 (.html)</button>
+    </div>
+
+    <div class="preview-section">
+      <div class="sidebar-title" style="margin-bottom: 10px;">프리뷰 (클릭하여 재생 테스트)</div>
+      <div class="preview-wrapper" id="preview-wrapper">
+        <div id="preview-screen">
+          <div id="standing-container" class="has-shadow">
+            <img id="character-img-1" class="standing-character" src="" alt="">
+            <img id="character-img-2" class="standing-character" src="" alt="">
+            <img id="character-img-3" class="standing-character" src="" alt="">
+            <img id="character-img-4" class="standing-character" src="" alt="">
+          </div>
+          <div id="dialogue-box">
+            <div id="dialogue-content">
+              <div id="speaker-name">System</div>
+              <div id="dialogue-text">왼쪽 패널에서 HTML과 JSON을 업로드해주세요.</div>
+            </div>
+            <div id="next-arrow">▼</div>
+          </div>
+          <div id="bottom-ui">
+            <button id="auto-play-btn" title="자동 재생">▶</button>
+            <input type="range" id="progress-slider" min="0" max="0" value="0">
+            <span id="page-indicator">0 / 0</span>
+            <button id="controls-toggle" aria-label="진행도 창 열기" aria-expanded="false">▼</button>
+          </div>
+          <div id="log-view" role="log" aria-label="이전 대화 로그"><div id="log-text"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let storyData = [];
+    let bgBase64 = "";
+    let sceneBackgrounds = [];
+    const baseBackgroundSettings = { x: 50, y: 50, zoom: 0 };
+    let highResImageMap = {}; 
+    let currentIndex = 0;
+    let isTyping = false;
+    let currentText = "";
+    let typeInterval;
+    let autoPlayTimeout;
+    let isAutoPlaying = false;
+    
+    let narrationNames = [];
+    let standingX = 0;
+    let standingY = 0;
+    let standingSize = 100;
+    let standingGap = 0;
+    let standingShadow = true;
+    let canvasWidth = 1200;
+    let canvasHeight = 900;
+    let characterStandingSettings = {};
+    let activeStandingCharacter = '';
+    let standingDivision = 2;
+    let standingPositionLock = false;
+    let characterPositionSettings = {};
+    let theme = "dark";
+    let dialogueFont = "gothic";
+    let dialogueFontSize = 20;
+    let dialogueFontsRequested = false;
+    let bgmDataUrl = '';
+    let bgmVolume = 35;
+    const bgmAudio = document.getElementById('bgm-audio');
+    function setBgmStatus(message) { document.getElementById('bgm-status').textContent = message; }
+    document.getElementById('bgm-upload').addEventListener('change', event => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (file.type && !file.type.startsWith('audio/')) { setBgmStatus('오디오 파일을 선택해 주세요.'); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        bgmDataUrl = String(reader.result || '');
+        bgmAudio.src = bgmDataUrl;
+        bgmAudio.load();
+        document.getElementById('bgm-file-name').textContent = file.name;
+        setBgmToggleIcon(false);
+        setBgmStatus('오디오 파일을 준비했습니다. 재생을 누르면 반복됩니다.');
+      };
+      reader.onerror = () => setBgmStatus('오디오 파일을 읽지 못했습니다.');
+      reader.readAsDataURL(file);
+    });
+    function startBgm() {
+      if (!bgmDataUrl) { setBgmStatus('먼저 오디오 파일을 업로드해 주세요.'); return; }
+      bgmAudio.volume = bgmVolume / 100;
+      bgmAudio.play().then(() => setBgmStatus('오디오를 반복 재생 중입니다.')).catch(() => setBgmStatus('재생할 수 없는 오디오 형식이거나 브라우저가 재생을 막았습니다.'));
+    }
+    function setBgmToggleIcon(isPlaying) {
+      const button = document.getElementById('bgm-play-toggle');
+      button.setAttribute('aria-label', isPlaying ? '일시정지' : '재생');
+      button.title = isPlaying ? '일시정지' : '재생';
+      button.innerHTML = isPlaying ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg>';
+    }
+    function toggleBgm() {
+      if (!bgmAudio.paused) { bgmAudio.pause(); setBgmToggleIcon(false); }
+      else startBgm();
+    }
+    bgmAudio.addEventListener('play', () => setBgmToggleIcon(true));
+    bgmAudio.addEventListener('pause', () => setBgmToggleIcon(false));
+    bgmAudio.addEventListener('error', () => { if (bgmDataUrl) setBgmStatus('이 오디오 파일은 브라우저에서 재생할 수 없습니다.'); });
+    document.getElementById('bgm-play-toggle').addEventListener('click', toggleBgm);
+    document.getElementById('bgm-volume').addEventListener('input', e => {
+      bgmVolume = Number(e.target.value);
+      bgmAudio.volume = bgmVolume / 100;
+    });
+    document.addEventListener('wheel', event => {
+      if (!(event.target instanceof Element)) return;
+      const slider = event.target.closest('input[type="range"]');
+      if (!slider || slider.disabled) return;
+      event.preventDefault();
+      const min = slider.min === '' ? 0 : Number(slider.min);
+      const max = slider.max === '' ? 100 : Number(slider.max);
+      const rawStep = slider.step === '' || slider.step === 'any' ? 1 : Number(slider.step);
+      const step = Number.isFinite(rawStep) && rawStep > 0 ? rawStep : 1;
+      const direction = event.deltaY < 0 ? 1 : event.deltaY > 0 ? -1 : 0;
+      if (!direction) return;
+      const next = Math.min(max, Math.max(min, Number(slider.value) + direction * step));
+      if (next === Number(slider.value)) return;
+      slider.value = String(next);
+      slider.dispatchEvent(new Event('input', { bubbles: true }));
+    }, { passive: false });
+
+    function scalePreview() {
+      const wrapper = document.getElementById('preview-wrapper');
+      const screen = document.getElementById('preview-screen');
+      const scale = Math.min((wrapper.clientWidth - 8) / canvasWidth, (wrapper.clientHeight - 8) / canvasHeight);
+      screen.style.transform = `translate(-50%, -50%) scale(${Math.max(0, scale)})`;
+    }
+    window.addEventListener('resize', scalePreview);
+    setTimeout(scalePreview, 100); 
+
+    function applyCanvasSize(width, height) {
+      canvasWidth = Math.round(width);
+      canvasHeight = Math.round(height);
+      const screen = document.getElementById('preview-screen');
+      screen.style.width = `${canvasWidth}px`;
+      screen.style.height = `${canvasHeight}px`;
+      scalePreview();
+      updatePreviewBackground(currentIndex);
+      if (currentIndex >= 0) renderPreview(currentIndex);
+    }
+    document.getElementById('canvas-preset').addEventListener('change', e => {
+      if (!e.target.value) return;
+      const [width, height] = e.target.value.split('x').map(Number);
+      document.getElementById('canvas-width').value = width;
+      document.getElementById('canvas-height').value = height;
+      document.getElementById('canvas-size-warning').style.display = 'none';
+      applyCanvasSize(width, height);
+    });
+    function commitCanvasSize() {
+      const widthField = document.getElementById('canvas-width');
+      const heightField = document.getElementById('canvas-height');
+      const warning = document.getElementById('canvas-size-warning');
+      const width = Math.round(Number(widthField.value));
+      const height = Math.round(Number(heightField.value));
+      const messages = [];
+      [['가로', width], ['세로', height]].forEach(([label, value]) => {
+        if (!Number.isFinite(value) || value < 400) messages.push(`${label}는 최소 400px 이상부터 가능합니다.`);
+        else if (value > 3000) messages.push(`${label}는 최대 3000px까지만 가능합니다.`);
+      });
+      warning.textContent = messages.join(' ');
+      warning.style.display = messages.length ? 'block' : 'none';
+      if (messages.length) return;
+      const presetValue = `${width}x${height}`;
+      document.getElementById('canvas-preset').value = ['1200x900', '1600x900'].includes(presetValue) ? presetValue : '';
+      if (width === canvasWidth && height === canvasHeight) return;
+      applyCanvasSize(width, height);
+    }
+    ['canvas-width', 'canvas-height'].forEach(id => {
+      const input = document.getElementById(id);
+      input.addEventListener('blur', commitCanvasSize);
+      input.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        commitCanvasSize();
+        input.blur();
+      });
+    });
+
+    function populateCharacterNames() {
+      const names = [...new Set(storyData.map(scene => String(scene.name || '').trim()).filter(name => name && name !== '-'))];
+      narrationNames = narrationNames.filter(name => names.includes(name));
+      renderNameCheckboxes('narration-name-list', names, narrationNames, selected => { narrationNames = selected; if (currentIndex >= 0) renderPreview(currentIndex); });
+      const standingSelect = document.getElementById('standing-character-select');
+      const previousStandingName = activeStandingCharacter;
+      standingSelect.replaceChildren(...names.map(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; return option; }));
+      if (names.length) { activeStandingCharacter = names.includes(previousStandingName) ? previousStandingName : names[0]; standingSelect.value = activeStandingCharacter; updateCharacterStandingControls(); }
+      renderCharacterPositionControls(names);
+    }
+    function renderNameCheckboxes(containerId, names, selectedNames, onChange) {
+      const container = document.getElementById(containerId); container.replaceChildren();
+      names.forEach((name, index) => {
+        const label = document.createElement('label'); label.className = 'name-check-row';
+        const text = document.createElement('span'); text.textContent = name;
+        const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.value = name; checkbox.checked = selectedNames.includes(name); checkbox.id = `${containerId}-${index}`;
+        checkbox.addEventListener('change', () => onChange(Array.from(container.querySelectorAll('input:checked'), input => input.value)));
+        label.append(text, checkbox); container.appendChild(label);
+      });
+    }
+    function renderCharacterPositionControls(names) {
+      const container = document.getElementById('character-position-list'); container.replaceChildren();
+      for (let slot = 1; slot <= standingDivision; slot++) {
+        const row = document.createElement('label'); row.className = 'character-position-row';
+        const slotText = document.createElement('span'); slotText.textContent = `${slot}구역`;
+        const select = document.createElement('select'); select.setAttribute('aria-label', `${slot}구역 캐릭터 선택`);
+        const empty = document.createElement('option'); empty.value = ''; empty.textContent = '선택 안 함'; select.appendChild(empty);
+        names.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; select.appendChild(option); });
+        const savedName = characterPositionSettings[slot] || '';
+        select.value = savedName && names.includes(savedName) ? savedName : '';
+        select.addEventListener('change', () => {
+          Object.keys(characterPositionSettings).forEach(position => { if (Number(position) === slot || characterPositionSettings[position] === select.value) delete characterPositionSettings[position]; });
+          if (select.value) characterPositionSettings[slot] = select.value;
+          renderCharacterPositionControls(names);
+          if (currentIndex >= 0) renderPreview(currentIndex);
+        });
+        row.append(slotText, select); container.appendChild(row);
+      }
+    }
+    function updateCharacterStandingControls() {
+      const settings = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 };
+      document.getElementById('character-standing-x').value = settings.x || 0;
+      document.getElementById('character-standing-y').value = settings.y;
+      document.getElementById('character-standing-size').value = settings.size;
+      document.getElementById('character-standing-x-value').textContent = `${settings.x || 0} px`;
+      document.getElementById('character-standing-y-value').textContent = `${settings.y} px`;
+      document.getElementById('character-standing-size-value').textContent = `${settings.size}%`;
+    }
+    function getCharacterStandingSettings(name) { return characterStandingSettings[name] || { x: 0, y: 0, size: 100 }; }
+    function getBackgroundScale(settings) {
+      if (!settings.width || !settings.height) return 1;
+      const coverScale = Math.max(canvasWidth / settings.width, canvasHeight / settings.height);
+      return coverScale * (1 + Number(settings.zoom || 0) / 100);
+    }
+    function fittedBackgroundSize(settings) {
+      if (!settings.width || !settings.height) return 'cover';
+      const scale = getBackgroundScale(settings);
+      return `${Math.round(settings.width * scale)}px ${Math.round(settings.height * scale)}px`;
+    }
+    function getBackgroundPosition(settings) {
+      const scale = getBackgroundScale(settings);
+      const scaledWidth = settings.width ? settings.width * scale : canvasWidth;
+      const scaledHeight = settings.width && settings.height ? settings.height * scale : canvasHeight;
+      const centeredX = (canvasWidth - scaledWidth) / 2;
+      const centeredY = (canvasHeight - scaledHeight) / 2;
+      const panX = (Number(settings.x ?? 50) - 50) * canvasWidth / 100;
+      const panY = (Number(settings.y ?? 50) - 50) * canvasHeight / 100;
+      return `${centeredX + panX}px ${centeredY + panY}px`;
+    }
+    function readImageSize(source, settings, onReady) {
+      const image = new Image();
+      image.onload = () => { settings.width = image.naturalWidth; settings.height = image.naturalHeight; onReady(); };
+      image.src = source;
+    }
+    function applyPreviewSettings(updateStanding = true) {
+      const screen = document.getElementById('preview-screen');
+      screen.classList.toggle('is-light', theme === 'light');
+      const isMyeongjo = dialogueFont === 'myeongjo';
+      const fontStack = isMyeongjo ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
+      screen.style.setProperty('--dialogue-font-family', fontStack);
+      screen.style.setProperty('--dialogue-font-size', `${dialogueFontSize}px`);
+      screen.style.setProperty('--dialogue-letter-spacing', isMyeongjo ? '0' : 'normal');
+      screen.style.setProperty('--speaker-letter-spacing', isMyeongjo ? '0' : '1px');
+      const standingContainer = document.getElementById('standing-container');
+      standingContainer.classList.toggle('has-shadow', standingShadow);
+      standingContainer.style.transform = `translate(${standingX}px, ${-standingY}px) scale(${standingSize / 100})`;
+      if (updateStanding && currentIndex >= 0 && storyData.length) renderStandingPair(currentIndex);
+    }
+    function updatePreviewBackground(index) {
+      const match = [...sceneBackgrounds].reverse().find(item => item.image && index >= item.start && index <= item.end);
+      const bg = match ? match.image : bgBase64;
+      const settings = match || baseBackgroundSettings;
+      const screen = document.getElementById('preview-screen');
+      screen.style.backgroundImage = bg ? `url('${bg}')` : '';
+      screen.style.backgroundPosition = getBackgroundPosition(settings);
+      screen.style.backgroundRepeat = 'no-repeat';
+      screen.style.backgroundSize = fittedBackgroundSize(settings);
+    }
+    function updateSceneBackgroundAvailability() {
+      const button = document.getElementById('add-scene-bg');
+      const notice = document.getElementById('scene-bg-notice');
+      const hasBaseBackground = Boolean(bgBase64);
+      const hasStory = storyData.length > 0;
+      const unavailable = !(hasBaseBackground && hasStory);
+      button.setAttribute('aria-disabled', String(unavailable));
+      button.style.opacity = unavailable ? '.55' : '1';
+      button.style.cursor = unavailable ? 'not-allowed' : 'pointer';
+      if (!unavailable) notice.style.display = 'none';
+    }
+    document.getElementById('theme-select').addEventListener('change', e => { theme = e.target.value; applyPreviewSettings(); });
+    document.getElementById('dialogue-font-select').addEventListener('change', e => { dialogueFont = e.target.value; applyPreviewSettings(); });
+    document.getElementById('dialogue-font-size').addEventListener('change', e => { dialogueFontSize = Number(e.target.value); applyPreviewSettings(); });
+    document.getElementById('standing-x').addEventListener('input', e => { standingX = Number(e.target.value); document.getElementById('standing-x-value').textContent = `${standingX} px`; applyPreviewSettings(); if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('standing-y').addEventListener('input', e => { standingY = Number(e.target.value); document.getElementById('standing-y-value').textContent = `${standingY} px`; applyPreviewSettings(); if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('standing-gap').addEventListener('input', e => { standingGap = Number(e.target.value); document.getElementById('standing-gap-value').textContent = `${standingGap}%`; if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('standing-size').addEventListener('input', e => { standingSize = Number(e.target.value); document.getElementById('standing-size-value').textContent = `${standingSize}%`; applyPreviewSettings(); if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('standing-position-reset').addEventListener('click', () => {
+      standingX = 0; standingY = 0;
+      document.getElementById('standing-x').value = 0;
+      document.getElementById('standing-y').value = 0;
+      document.getElementById('standing-x-value').textContent = '0 px';
+      document.getElementById('standing-y-value').textContent = '0 px';
+      applyPreviewSettings();
+      if (currentIndex >= 0) renderPreview(currentIndex);
+    });
+    document.getElementById('standing-size-reset').addEventListener('click', () => {
+      standingSize = 100;
+      document.getElementById('standing-size').value = 100;
+      document.getElementById('standing-size-value').textContent = '100%';
+      applyPreviewSettings();
+      if (currentIndex >= 0) renderPreview(currentIndex);
+    });
+    document.getElementById('standing-gap-reset').addEventListener('click', () => {
+      standingGap = 0;
+      document.getElementById('standing-gap').value = 0;
+      document.getElementById('standing-gap-value').textContent = '0%';
+      if (currentIndex >= 0) renderPreview(currentIndex);
+    });
+    ['base-bg-x', 'base-bg-y', 'base-bg-zoom'].forEach(id => document.getElementById(id).addEventListener('input', e => { document.getElementById(id + '-value').textContent = `${e.target.value}%`; }));
+    document.getElementById('standing-shadow').addEventListener('change', e => {
+      standingShadow = e.target.checked;
+      const container = document.getElementById('standing-container');
+      container.classList.add('instant-shadow-change');
+      container.querySelectorAll('.standing-character').forEach(img => {
+        img.style.transition = 'none';
+      });
+      container.classList.toggle('has-shadow', standingShadow);
+      void container.offsetWidth;
+      container.querySelectorAll('.standing-character').forEach(img => { img.style.transition = ''; });
+      container.classList.remove('instant-shadow-change');
+    });
+    document.getElementById('character-standing-reset').addEventListener('click', () => {
+      if (!activeStandingCharacter) return;
+      delete characterStandingSettings[activeStandingCharacter];
+      updateCharacterStandingControls();
+      if (currentIndex >= 0) renderPreview(currentIndex);
+    });
+    document.getElementById('standing-character-select').addEventListener('change', e => { activeStandingCharacter = e.target.value; updateCharacterStandingControls(); });
+    document.getElementById('character-standing-x').addEventListener('input', e => { const setting = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 }; setting.x = Number(e.target.value); characterStandingSettings[activeStandingCharacter] = setting; document.getElementById('character-standing-x-value').textContent = `${setting.x} px`; if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('character-standing-y').addEventListener('input', e => { const setting = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 }; setting.y = Number(e.target.value); characterStandingSettings[activeStandingCharacter] = setting; document.getElementById('character-standing-y-value').textContent = `${setting.y} px`; if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('character-standing-size').addEventListener('input', e => { const setting = characterStandingSettings[activeStandingCharacter] || { x: 0, y: 0, size: 100 }; setting.size = Number(e.target.value); characterStandingSettings[activeStandingCharacter] = setting; document.getElementById('character-standing-size-value').textContent = `${setting.size}%`; if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('standing-division').addEventListener('change', e => { standingDivision = Number(e.target.value); renderCharacterPositionControls([...new Set(storyData.map(scene => String(scene.name || '').trim()).filter(name => name && name !== '-'))]); if (currentIndex >= 0) renderPreview(currentIndex); });
+    document.getElementById('standing-position-lock').addEventListener('change', e => { standingPositionLock = e.target.checked; document.getElementById('character-position-controls').style.display = standingPositionLock ? 'flex' : 'none'; if (currentIndex >= 0) renderPreview(currentIndex); });
+    [['base-bg-x','x'],['base-bg-y','y'],['base-bg-zoom','zoom']].forEach(([id,key]) => document.getElementById(id).addEventListener('input', e => { baseBackgroundSettings[key] = Number(e.target.value); updatePreviewBackground(currentIndex); }));
+    document.getElementById('base-bg-position-reset').addEventListener('click', () => {
+      Object.assign(baseBackgroundSettings, { x: 50, y: 50 });
+      document.getElementById('base-bg-x').value = 50;
+      document.getElementById('base-bg-y').value = 50;
+      document.getElementById('base-bg-x-value').textContent = '50%';
+      document.getElementById('base-bg-y-value').textContent = '50%';
+      updatePreviewBackground(currentIndex);
+    });
+    document.getElementById('base-bg-size-reset').addEventListener('click', () => {
+      baseBackgroundSettings.zoom = 0;
+      document.getElementById('base-bg-zoom').value = 0;
+      document.getElementById('base-bg-zoom-value').textContent = '0%';
+      updatePreviewBackground(currentIndex);
+    });
+
+    function addSceneBackgroundRow() {
+      const item = { image: '', start: 0, end: Math.max(0, storyData.length - 1), x: 50, y: 50, zoom: 0 };
+      sceneBackgrounds.push(item);
+      const row = document.createElement('div'); row.className = 'bg-range-card';
+      row.innerHTML = `<button type="button" class="remove-bg" aria-label="배경 삭제" title="배경 삭제"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><label class="bg-upload-tile" title="배경 이미지 업로드" aria-label="배경 이미지 업로드"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg><img alt="구간 배경 썸네일"><input type="file" accept="image/*"></label><div class="bg-range-controls"><strong style="font-size:11px;">구간 배경 ${sceneBackgrounds.length}</strong><div class="bg-range-pair"><label style="font-size:10px;">시작<select class="bg-start"></select></label><label style="font-size:10px;">종료<select class="bg-end"></select></label></div><div class="bg-range-settings"><label class="bg-mini-control"><span>X</span><input type="range" min="0" max="100" value="50" data-setting="x"><small class="range-value" data-value-for="x">50%</small></label><label class="bg-mini-control"><span>Y</span><input type="range" min="0" max="100" value="50" data-setting="y"><small class="range-value" data-value-for="y">50%</small></label><label class="bg-mini-control bg-size-control"><span>S</span><input type="range" min="-50" max="50" value="0" data-setting="zoom"><small class="range-value" data-value-for="zoom">0%</small></label></div></div>`;
+      const rangeSettings = row.querySelector('.bg-range-settings');
+      const xControl = row.querySelector('[data-setting="x"]').closest('label');
+      const yControl = row.querySelector('[data-setting="y"]').closest('label');
+      const zoomControl = row.querySelector('[data-setting="zoom"]').closest('label');
+      const makeResetButton = (className, label) => {
+        const button = document.createElement('button');
+        button.type = 'button'; button.className = 'bg-reset-icon ' + className;
+        button.setAttribute('aria-label', label); button.title = label;
+        button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg>';
+        return button;
+      };
+      const positionGroup = document.createElement('div'); positionGroup.className = 'bg-range-control-group';
+      const positionReset = makeResetButton('reset-position', '위치 초기화');
+      const locationInputs = document.createElement('div'); locationInputs.className = 'bg-range-location-inputs';
+      locationInputs.append(xControl, yControl, positionReset); positionGroup.append(locationInputs);
+      const sizeGroup = document.createElement('div'); sizeGroup.className = 'bg-range-control-group';
+      const sizeReset = makeResetButton('reset-size', '크기 초기화');
+      const sizeRow = document.createElement('div'); sizeRow.className = 'bg-range-size-row';
+      sizeRow.append(zoomControl, sizeReset); sizeGroup.append(sizeRow);
+      rangeSettings.replaceChildren(positionGroup, sizeGroup);
+      row.appendChild(rangeSettings);
+      positionReset.addEventListener('click', () => {
+        item.x = 50; item.y = 50;
+        xControl.querySelector('input').value = 50; yControl.querySelector('input').value = 50; xControl.querySelector('[data-value-for]').textContent = '50%'; yControl.querySelector('[data-value-for]').textContent = '50%';
+        updatePreviewBackground(currentIndex);
+      });
+      sizeReset.addEventListener('click', () => {
+        item.zoom = 0; zoomControl.querySelector('input').value = 0; zoomControl.querySelector('[data-value-for]').textContent = '0%';
+        updatePreviewBackground(currentIndex);
+      });
+      const tile = row.querySelector('.bg-upload-tile');
+      const file = row.querySelector('input[type="file"]'); file.addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const reader = new FileReader(); reader.onload = () => { item.image = reader.result; const thumb = row.querySelector('img'); thumb.src = item.image; tile.classList.add('has-image'); readImageSize(item.image, item, () => updatePreviewBackground(currentIndex)); }; reader.readAsDataURL(f); });
+      row.querySelectorAll('[data-setting]').forEach(input => input.addEventListener('input', () => { item[input.dataset.setting] = Number(input.value); row.querySelector(`[data-value-for=\"${input.dataset.setting}\"]`).textContent = `${input.value}%`; updatePreviewBackground(currentIndex); }));
+      row.querySelector('.remove-bg').addEventListener('click', () => { sceneBackgrounds = sceneBackgrounds.filter(entry => entry !== item); row.remove(); updatePreviewBackground(currentIndex); });
+      const list = document.getElementById('scene-bg-list');
+      list.insertBefore(row, document.getElementById('add-scene-bg')); populateBackgroundRange(row, item);
+    }
+    function populateBackgroundRange(row, item) {
+      const labelFor = i => `${i + 1}. ${storyData[i]?.name || '대사'} — ${(storyData[i]?.text || '').slice(0, 20)}`;
+      const start = row.querySelector('.bg-start');
+      const end = row.querySelector('.bg-end');
+      [start, end].forEach(select => select.replaceChildren(...storyData.map((scene, i) => { const option = document.createElement('option'); option.value = i; option.textContent = labelFor(i); return option; })));
+      start.value = item.start; end.value = item.end;
+      start.addEventListener('change', () => { item.start = Number(start.value); if (item.start > item.end) { item.end = item.start; end.value = item.end; } updatePreviewBackground(currentIndex); });
+      end.addEventListener('change', () => { item.end = Number(end.value); if (item.end < item.start) { item.start = item.end; start.value = item.start; } updatePreviewBackground(currentIndex); });
+    }
+    document.getElementById('add-scene-bg').addEventListener('click', () => {
+      const notice = document.getElementById('scene-bg-notice');
+      if (!bgBase64) {
+        notice.textContent = '구간별 배경을 추가하려면 기본 배경 이미지를 먼저 업로드하세요.';
+        notice.style.display = 'block';
+        return;
+      }
+      if (!storyData.length) {
+        notice.textContent = '구간별 위치를 지정하려면 HTML 로그를 먼저 업로드하세요.';
+        notice.style.display = 'block';
+        return;
+      }
+      notice.style.display = 'none';
+      addSceneBackgroundRow();
+    });
+
+    function parseCocoforiaHTML(htmlString) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString, 'text/html');
+      const messages = [];
+      const articles = doc.querySelectorAll('article.message');
+      
+      articles.forEach(article => {
+        const speakerEl = article.querySelector('.speaker');
+        const textEl = article.querySelector('.message-text');
+        const rollEl = article.querySelector('.roll-result');
+
+        if (speakerEl && textEl) {
+          let name = speakerEl.textContent.trim();
+          let text = textEl.textContent.trim();
+          let color = speakerEl.style.getPropertyValue('--speaker-color').trim() || '#ffffff';
+          if(rollEl) text += '\n' + rollEl.textContent.trim();
+
+          messages.push({ name, text, color });
+        }
+      });
+      storyData = messages;
+      populateCharacterNames();
+      return messages;
+    }
+
+    function getStandingSlots(index) {
+      const figures = Array(standingDivision).fill(null);
+      let nextArrivalOrder = 0;
+      let lastSpeaker = '';
+      let previousSpeaker = '';
+      const reservedSlots = Array(standingDivision).fill('');
+      if (standingPositionLock) Object.entries(characterPositionSettings).forEach(([position, character]) => { const slot = Number(position) - 1; if (slot >= 0 && slot < standingDivision) reservedSlots[slot] = character; });
+      const slotAllowed = (slot, name) => !standingPositionLock || !reservedSlots[slot] || reservedSlots[slot] === name;
+      for (let i = 0; i <= index; i++) {
+        const scene = storyData[i];
+        const name = String(scene?.name || '').trim();
+        const image = scene?.imageId ? highResImageMap[scene.imageId] : null;
+        if (narrationNames.includes(name)) { figures.fill(null); lastSpeaker = ''; previousSpeaker = ''; continue; }
+        if (!name || name === '-' || !image) continue;
+        const replacementSpeaker = previousSpeaker;
+        if (lastSpeaker && lastSpeaker !== name) figures.forEach(figure => { if (figure) figure.dimmed = true; });
+        const existingIndex = figures.findIndex(figure => figure?.name === name);
+        const assignedPosition = standingPositionLock ? Number(Object.keys(characterPositionSettings).find(position => characterPositionSettings[position] === name)) : 0;
+        if (standingPositionLock && assignedPosition > standingDivision) { if (lastSpeaker && lastSpeaker !== name) previousSpeaker = lastSpeaker; lastSpeaker = name; continue; }
+        const fixedPosition = assignedPosition;
+        let target = fixedPosition >= 1 && fixedPosition <= standingDivision ? fixedPosition - 1 : (existingIndex >= 0 && slotAllowed(existingIndex, name) ? existingIndex : -1);
+        if (target < 0) {
+          target = figures.findIndex((figure, slot) => !figure && slotAllowed(slot, name));
+          if (target < 0) {
+            if (standingDivision === 2) {
+              const previousSlot = figures.findIndex(figure => figure?.name === replacementSpeaker);
+              if (previousSlot >= 0 && slotAllowed(previousSlot, name)) target = previousSlot;
+            }
+            if (target < 0) {
+              const candidates = figures.map((figure, slot) => ({ figure, slot })).filter(entry => entry.figure && slotAllowed(entry.slot, name));
+              if (candidates.length) target = candidates.reduce((oldest, entry) => entry.figure.arrivalOrder < oldest.figure.arrivalOrder ? entry : oldest).slot;
+            }
+          }
+        }
+        if (target < 0) { if (lastSpeaker && lastSpeaker !== name) previousSpeaker = lastSpeaker; lastSpeaker = name; continue; }
+        if (existingIndex >= 0 && existingIndex !== target) figures[existingIndex] = null;
+        if (figures[target]?.name === name) { figures[target].image = image; figures[target].dimmed = false; }
+        else figures[target] = { name, image, dimmed: false, arrivalOrder: nextArrivalOrder++ };
+        if (lastSpeaker && lastSpeaker !== name) previousSpeaker = lastSpeaker;
+        lastSpeaker = name;
+      }
+      return figures;
+    }
+    function setStandingDimState(img, figure) {
+      img.dataset.characterName = figure.name;
+      img.classList.toggle('is-dimmed', Boolean(figure.dimmed));
+    }
+    function appendDialogueText(container, text) {
+      const punctuationPattern = /[.．…‥⋯·・･]+/gu;
+      let cursor = 0;
+      let match;
+      while ((match = punctuationPattern.exec(String(text || '')))) {
+        if (match.index > cursor) container.appendChild(document.createTextNode(String(text).slice(cursor, match.index)));
+        const punctuation = document.createElement('span');
+        punctuation.className = 'spacing-neutral-punctuation';
+        punctuation.textContent = match[0];
+        container.appendChild(punctuation);
+        cursor = punctuationPattern.lastIndex;
+      }
+      if (cursor < String(text || '').length) container.appendChild(document.createTextNode(String(text || '').slice(cursor)));
+    }
+    function appendTypedDialogueCharacter(container, character, state) {
+      if (/[.．…‥⋯·・･]/u.test(character)) {
+        if (!state.punctuationSpan) {
+          state.punctuationSpan = document.createElement('span');
+          state.punctuationSpan.className = 'spacing-neutral-punctuation';
+          container.appendChild(state.punctuationSpan);
+        }
+        state.punctuationSpan.appendChild(document.createTextNode(character));
+      } else {
+        state.punctuationSpan = null;
+        container.appendChild(document.createTextNode(character));
+      }
+    }
+    function renderStandingPair(index) {
+      const figures = getStandingSlots(index);
+      [1, 2, 3, 4].forEach(slot => {
+        const img = document.getElementById(`character-img-${slot}`);
+        const figure = figures[slot - 1];
+        if (slot > standingDivision || !figure) { img.style.display = 'none'; img.classList.remove('is-dimmed'); delete img.dataset.characterName; return; }
+        const segmentWidth = canvasWidth / standingDivision;
+        const baseCenter = (slot - 0.5) * segmentWidth;
+        const standing = getCharacterStandingSettings(figure.name);
+        img.style.left = `${canvasWidth / 2 + (baseCenter - canvasWidth / 2) * (1 + standingGap / 100) + Number(standing.x || 0)}px`;
+        img.style.transform = 'translateX(-50%)';
+        img.style.bottom = `${standing.y}px`;
+        img.style.height = `${850 * standing.size / 100}px`;
+        if (img.src !== figure.image) img.src = figure.image;
+        setStandingDimState(img, figure);
+        img.style.display = 'block';
+      });
+    }
+
+    function applyJSONData(jsonData) {
+      if (!jsonData || typeof jsonData !== 'object' || Array.isArray(jsonData)) throw new Error('최상위 데이터가 객체가 아닙니다.');
+      const jsonMessages = Array.isArray(jsonData.messages) ? jsonData.messages : [];
+      if (jsonData.images && typeof jsonData.images === 'object' && !Array.isArray(jsonData.images)) highResImageMap = jsonData.images;
+      if (!storyData.length && Array.isArray(jsonData.messages)) {
+        storyData = jsonMessages.filter(message => message && typeof message === 'object' && typeof message.text === 'string').map(message => ({ name: String(message.name || message.speaker || '-'), text: message.text, color: message.color || '#ffffff', imageId: message.iconImage || undefined }));
+      }
+      if (jsonMessages.length && storyData.length > 0) {
+        let jsonSearchIndex = 0;
+        for (let i = 0; i < storyData.length; i++) {
+            const htmlMsg = storyData[i];
+            const htmlCompareText = String(htmlMsg.text || '').replace(/\s/g, '');
+            let matchedJsonMsg = null;
+            for (let j = jsonSearchIndex; j < jsonMessages.length; j++) {
+                const m = jsonMessages[j];
+                if (!m || typeof m !== 'object' || typeof m.text !== 'string' || !m.text) continue;
+                const jsonCompareText = m.text.replace(/\s/g, '');
+                if (m.name === htmlMsg.name && htmlCompareText.includes(jsonCompareText)) {
+                    matchedJsonMsg = m;
+                    jsonSearchIndex = j + 1;
+                    break;
+                }
+            }
+            if (matchedJsonMsg && matchedJsonMsg.iconImage) {
+                // 용량 최적화: Base64 전체 저장 대신 ID만 저장
+                if (highResImageMap[matchedJsonMsg.iconImage]) {
+                    htmlMsg.imageId = matchedJsonMsg.iconImage;
+                }
+            }
+        }
+      }
+      populateCharacterNames();
+    }
+
+    function renderPreview(index) {
+      if (index >= storyData.length) {
+        if (isAutoPlaying) toggleAutoPlay();
+        alert("미리보기 대본이 끝났습니다.");
+        return;
+      }
+
+      clearTimeout(autoPlayTimeout);
+      document.getElementById('page-indicator').textContent = (index + 1) + " / " + storyData.length;
+      document.getElementById('progress-slider').value = index;
+
+      const scene = storyData[index];
+      const nameBox = document.getElementById('speaker-name');
+      const dialogueBox = document.getElementById('dialogue-box');
+      dialogueBox.style.display = 'flex';
+      requestAnimationFrame(() => requestAnimationFrame(() => dialogueBox.classList.add('is-visible')));
+      nameBox.textContent = scene.name;
+      nameBox.style.color = scene.color;
+      nameBox.style.visibility = narrationNames.includes(scene.name) ? 'hidden' : 'visible';
+      applyPreviewSettings(false);
+      updatePreviewBackground(index);
+
+      renderStandingPair(index);
+
+      const textBox = document.getElementById('dialogue-text');
+      currentText = scene.text;
+      textBox.textContent = "";
+      isTyping = true;
+      let charIndex = 0;
+      const typingState = { punctuationSpan: null };
+      
+      clearInterval(typeInterval);
+      typeInterval = setInterval(() => {
+        appendTypedDialogueCharacter(textBox, currentText.charAt(charIndex), typingState);
+        charIndex++;
+        
+        textBox.scrollTop = textBox.scrollHeight; 
+        
+        if (charIndex >= currentText.length) {
+          clearInterval(typeInterval);
+          isTyping = false;
+          if (isAutoPlaying) {
+             autoPlayTimeout = setTimeout(() => {
+                 currentIndex++;
+                 renderPreview(currentIndex);
+             }, 1500);
+          }
+        }
+      }, 20);
+    }
+
+    function toggleAutoPlay() {
+        isAutoPlaying = !isAutoPlaying;
+        const btn = document.getElementById('auto-play-btn');
+        btn.classList.toggle('is-playing', isAutoPlaying);
+        btn.setAttribute('aria-label', isAutoPlaying ? '자동 재생 중지' : '자동 재생');
+        btn.style.backgroundColor = 'transparent';
+
+        if (isAutoPlaying) {
+            if (currentIndex === -1) {
+                currentIndex = 0;
+                renderPreview(currentIndex);
+            } else if (!isTyping && currentIndex < storyData.length) {
+                clearTimeout(autoPlayTimeout);
+                autoPlayTimeout = setTimeout(() => {
+                    currentIndex++;
+                    renderPreview(currentIndex);
+                }, 1500);
+            }
+        } else {
+            clearTimeout(autoPlayTimeout);
+        }
+    }
+
+    document.getElementById('auto-play-btn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (bgmDataUrl && bgmAudio.paused) startBgm();
+        toggleAutoPlay();
+    });
+
+    document.getElementById('html-upload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        storyData = parseCocoforiaHTML(e.target.result);
+        if (storyData.length > 0) {
+          document.getElementById('icon-html').classList.add('done');
+          checkReady();
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('json-upload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        let jsonData;
+        try {
+          jsonData = JSON.parse(String(e.target.result).replace(/^\uFEFF/, ''));
+        } catch (error) {
+          alert("JSON 문법을 읽지 못했습니다. 파일이 손상됐거나 JSON 형식이 아닐 수 있습니다.");
+          return;
+        }
+        try {
+          applyJSONData(jsonData);
+          document.getElementById('icon-json').classList.add('done');
+          checkReady();
+        } catch (error) {
+          console.error('JSON 데이터 적용 오류:', error);
+          alert(`JSON은 읽었지만 데이터를 적용하지 못했습니다: ${error.message || error}`);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('bg-upload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        bgBase64 = e.target.result;
+        const thumb = document.getElementById('bg-upload-thumb');
+        thumb.src = bgBase64;
+        document.getElementById('lbl-bg').classList.add('has-image');
+        updateSceneBackgroundAvailability();
+        readImageSize(bgBase64, baseBackgroundSettings, () => updatePreviewBackground(currentIndex));
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function preloadDialogueFonts() {
+      if (dialogueFontsRequested || !document.fonts || !storyData.length) return;
+      dialogueFontsRequested = true;
+      const glyphs = [...new Set(storyData.map(scene => `${scene.name || ''}${scene.text || ''}`).join(''))].join('');
+      Promise.all([
+        document.fonts.load('400 20px "Pretendard"', glyphs),
+        document.fonts.load('800 20px "Pretendard"', glyphs),
+        document.fonts.load('400 20px "BookkMyungjo"', glyphs),
+        document.fonts.load('800 20px "BookkMyungjo"', glyphs)
+      ]).catch(() => {});
+    }
+
+    function checkReady() {
+        updateSceneBackgroundAvailability();
+        if(storyData.length > 0) {
+             preloadDialogueFonts();
+             document.getElementById('download-btn').disabled = false;
+             document.getElementById('bottom-ui').style.display = 'flex';
+             document.getElementById('preview-screen').classList.add('has-started');
+             document.getElementById('custom-ui-panel').style.display = 'flex'; 
+             populateCharacterNames();
+             document.getElementById('progress-slider').max = storyData.length - 1;
+             if (currentIndex === 0) {
+                 renderPreview(currentIndex);
+             }
+        }
+    }
+
+    document.getElementById('progress-slider').addEventListener('input', function(e) {
+      currentIndex = parseInt(e.target.value);
+      clearInterval(typeInterval);
+      clearTimeout(autoPlayTimeout);
+      isTyping = false;
+      renderPreview(currentIndex);
+    });
+
+    document.getElementById('bottom-ui').addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+
+    function openLogView() {
+      if (currentIndex < 0) return;
+      const logText = document.getElementById('log-text');
+      logText.replaceChildren();
+      storyData.slice(0, currentIndex + 1).forEach(scene => {
+        const entry = document.createElement('div'); entry.className = 'log-entry';
+        if (scene.name && scene.name !== '-') { const speaker = document.createElement('span'); speaker.textContent = `${scene.name}: `; speaker.style.color = scene.color; if (!narrationNames.includes(scene.name)) entry.appendChild(speaker); }
+        appendDialogueText(entry, String(scene.text || ''));
+        logText.appendChild(entry);
+      });
+      if (isAutoPlaying) toggleAutoPlay();
+      document.getElementById('preview-screen').classList.add('is-log-view');
+      const view = document.getElementById('log-view'); view.style.display = 'block'; view.scrollTop = view.scrollHeight;
+    }
+    function closeLogView() {
+      document.getElementById('log-view').style.display = 'none';
+      const box = document.getElementById('dialogue-box'); box.style.transition = 'none';
+      document.getElementById('preview-screen').classList.remove('is-log-view'); box.offsetWidth; box.style.transition = '';
+    }
+    document.getElementById('controls-toggle').addEventListener('click', function(e) {
+      e.stopPropagation(); const panel = document.getElementById('bottom-ui'); const isOpen = panel.classList.toggle('is-open');
+      this.textContent = isOpen ? '▲' : '▼'; this.setAttribute('aria-expanded', String(isOpen)); this.setAttribute('aria-label', isOpen ? '진행도 창 닫기' : '진행도 창 열기');
+    });
+    document.getElementById('log-view').addEventListener('click', e => { e.stopPropagation(); closeLogView(); });
+    document.getElementById('preview-screen').addEventListener('wheel', function(e) {
+      if (e.target.closest && e.target.closest('#bottom-ui')) return;
+      e.preventDefault(); if (e.deltaY < 0) openLogView(); else if (e.deltaY > 0) { closeLogView(); document.getElementById('preview-screen').click(); }
+    }, { passive:false });
+    document.addEventListener('keydown', e => {
+      if (document.getElementById('log-view').style.display === 'block') { if (e.key === 'Escape') closeLogView(); return; }
+      if (e.target.closest && e.target.closest('#bottom-ui')) return;
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); document.getElementById('preview-screen').click(); }
+    });
+
+    document.getElementById('preview-screen').addEventListener('click', function() {
+      if (bgmDataUrl && bgmAudio.paused) startBgm();
+      if (storyData.length === 0) return;
+      if (isTyping) {
+        clearInterval(typeInterval);
+        const dialogueTextBox = document.getElementById('dialogue-text');
+        dialogueTextBox.replaceChildren();
+        appendDialogueText(dialogueTextBox, currentText);
+        document.getElementById('dialogue-text').scrollTop = 0; 
+        isTyping = false;
+        if (isAutoPlaying) {
+             clearTimeout(autoPlayTimeout);
+             autoPlayTimeout = setTimeout(() => {
+                 currentIndex++;
+                 renderPreview(currentIndex);
+             }, 1500);
+        }
+      } else {
+        clearTimeout(autoPlayTimeout);
+        currentIndex++;
+        renderPreview(currentIndex);
+      }
+    });
+
+    // 최종 다운로드 생성기
+    document.getElementById('download-btn').addEventListener('click', function() {
+      if (storyData.length === 0) return;
+      
+      const storyJson = JSON.stringify(storyData);
+      const imageMapJson = JSON.stringify(highResImageMap); // 용량 최적화: 중복 없는 이미지 사전 생성
+      const sceneBackgroundsJson = JSON.stringify(sceneBackgrounds);
+      const narrationNamesJson = JSON.stringify(narrationNames);
+      const baseBackgroundSettingsJson = JSON.stringify(baseBackgroundSettings);
+      const characterStandingSettingsJson = JSON.stringify(characterStandingSettings);
+      const characterPositionSettingsJson = JSON.stringify(characterPositionSettings);
+      const standingGapValue = standingGap;
+      const standingShadowValue = standingShadow;
+      const standingXValue = standingX;
+      const dialogueFontFamilyValue = dialogueFont === 'myeongjo' ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
+      const dialogueFontSizeValue = dialogueFontSize;
+      const dialogueLetterSpacingValue = dialogueFont === 'myeongjo' ? '0' : 'normal';
+      const speakerLetterSpacingValue = dialogueFont === 'myeongjo' ? '0' : '1px';
+      const canvasWidthValue = canvasWidth;
+      const canvasHeightValue = canvasHeight;
+      const bgmVolumeValue = bgmVolume;
+      
+      const finalHTML = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRPG Replay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+    @font-face {
+      font-family: 'BookkMyungjo';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Lt.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'BookkMyungjo';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Bd.woff2') format('woff2');
+      font-weight: 700 800;
+      font-style: normal;
+      font-display: swap;
+    }
+    body { margin: 0; padding: 0; background-color: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'Noto Sans KR', sans-serif; }
+    #viewer-layout { position:relative; flex-shrink:0; }
+    #viewer-screen { width: ${canvasWidth}px; height: ${canvasHeight}px; background-color: #111; background-image: url('${bgBase64}'); background-size: contain; background-position: 50% 50%; background-repeat:no-repeat; position: absolute; cursor: pointer; flex-shrink: 0; transform-origin: top left; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+    #replay-bgm { position:absolute; display:flex; flex-direction:column; gap:8px; width:210px; color:#fff; font:12px 'Noto Sans KR',sans-serif; }
+    #replay-bgm-audio { display:none; }
+    #replay-bgm-controls { display:flex; align-items:center; gap:7px; }
+    #replay-bgm-heading { flex:0 0 auto; margin:0; color:#ddd; font-size:11px; }
+    #replay-bgm-controls button { flex:0 0 auto; width:30px; height:28px; display:inline-flex; align-items:center; justify-content:center; border:0; outline:0; box-shadow:none; border-radius:0; background:transparent; color:#fff; padding:0; cursor:pointer; }
+    #replay-bgm-controls button svg { width:14px; height:14px; fill:currentColor; stroke:currentColor; }
+    #replay-bgm-controls input { flex:0 0 20px; width:20px; min-width:20px; height:48px; accent-color:#fff; writing-mode:vertical-lr; direction:rtl; }
+    #bgm-status { margin:0; color:#ccc; font-size:10px; line-height:1.4; }
+    #bottom-ui { position:absolute; top:0; left:0; transform:translateY(-100%); width:100%; display:flex; align-items:center; gap:15px; box-sizing:border-box; background:transparent; padding:12px 20px 14px; border-radius:0; z-index:20; cursor:default; opacity:0; pointer-events:none; transition:transform .25s ease,background-color .2s ease,opacity .6s ease; }
+    #viewer-screen.has-started #bottom-ui { opacity:1; pointer-events:auto; }
+    #bottom-ui.is-open { transform:translateY(0); }
+    #bottom-ui:hover,#bottom-ui.is-open { background-color:rgba(20,20,20,.85); }
+    #controls-toggle { position:absolute; bottom:-38px; left:50%; transform:translate(-50%,0); width:64px; height:30px; border:0; border-radius:0 0 10px 10px; color:white; background:transparent; cursor:pointer; font-size:16px; transition:transform .2s ease; }
+    #bottom-ui:hover #controls-toggle { transform:translate(-50%,4px); }
+    #bottom-ui.is-open #controls-toggle:hover { transform:translate(-50%,-4px); }
+    #auto-play-btn { position:relative; background:transparent; color:white; border:none; padding:0; width:32px; height:32px; border-radius:0; display:flex; justify-content:center; align-items:center; cursor:pointer; text-align:center; font-size:0; transition:opacity .2s; }
+    #auto-play-btn::before { content:""; position:absolute; left:50%; top:50%; transform:translate(-66.667%,-50%); width:0; height:0; border-top:7px solid transparent; border-bottom:7px solid transparent; border-left:10px solid #fff; }
+    #auto-play-btn.is-playing::before { width:10px; height:10px; transform:translate(-50%,-50%); border:0; background:#fff; }
+    #auto-play-btn:hover { opacity:.75; }
+    #progress-slider { flex:1; cursor:pointer; accent-color:#fff; background:transparent; height:20px; appearance:none; -webkit-appearance:none; }
+    #progress-slider::-webkit-slider-runnable-track,#progress-slider::-moz-range-track { height:4px; border-radius:999px; background:rgba(255,255,255,.35); }
+    #progress-slider::-webkit-slider-thumb { width:14px; height:14px; margin-top:-5px; border:0; border-radius:50%; background:#fff; appearance:none; -webkit-appearance:none; }
+    #progress-slider::-moz-range-thumb { width:14px; height:14px; border:0; border-radius:50%; background:#fff; }
+    
+    #page-indicator { font-size: 15px; font-weight: bold; color: #ccc; min-width: 60px; text-align: right; }
+    #standing-container { position:absolute; inset:0; pointer-events:none; transform:translate(${standingXValue}px, ${-standingY}px) scale(${standingSize / 100}); transform-origin:bottom center; transition:transform .2s ease; z-index:5; }
+    .standing-character { position:absolute; bottom:0; left:50%; height:850px; width:auto; transform:translateX(-50%); transform-origin:bottom center; filter:none; transition:none; z-index:5; display:none; }
+    #standing-container.has-shadow .standing-character { filter:drop-shadow(0 5px 10px rgba(0,0,0,.2)); }
+    .standing-character.is-dimmed { filter:brightness(.55); }
+    #standing-container.has-shadow .standing-character.is-dimmed { filter:brightness(.55) drop-shadow(0 5px 15px rgba(0,0,0,.3)); }
+    
+    #dialogue-box { position: absolute; bottom: 0; left: 0; width: 100%; height: 220px; background: linear-gradient(to top, rgba(0,0,0,1) 0, rgba(20,20,20,.8) 100px, rgba(20,20,20,0) 100%); border-radius: 0; border: 0; padding: 40px 0; box-sizing: border-box; display: flex; justify-content: center; z-index: 10; color: white; box-shadow:none; }
+    #dialogue-content { width:70%; height:100%; display:flex; flex-direction:column; gap:12px; }
+    #viewer-screen.is-light #dialogue-box { background:linear-gradient(to top, rgba(255,255,255,1) 0, rgba(245,245,245,.88) 100px, rgba(245,245,245,0) 100%); color:#111; }
+    #viewer-screen.is-light #speaker-name { text-shadow:none; }
+    #viewer-screen.is-light #dialogue-text { color:#222 !important; }
+    #viewer-screen.is-light #next-arrow { color:#555; }
+    
+    #speaker-name { font-family: ${dialogueFontFamilyValue}; font-size: 20px; font-weight: 800; letter-spacing: ${speakerLetterSpacingValue}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+    #dialogue-text { font-family: ${dialogueFontFamilyValue}; font-size: ${dialogueFontSizeValue}px; letter-spacing: ${dialogueLetterSpacingValue}; line-height: 1.6; white-space: pre-wrap; word-break: keep-all; color: ${theme === 'light' ? '#222' : '#eaeaea'}; flex: 1; min-height: 0; overflow-y: auto; padding-right: 10px; }
+    
+    #dialogue-text::-webkit-scrollbar { width: 6px; }
+    #dialogue-text::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
+    #next-arrow { position: absolute; bottom: 20px; right: 15%; font-size: 18px; color: #aaa; animation: blink 1.2s infinite; }
+    #viewer-screen { overflow:hidden; }
+    #viewer-screen.is-log-view #dialogue-box { opacity:0; visibility:hidden; }
+    #log-view { font-family: ${dialogueFontFamilyValue}; letter-spacing: ${dialogueLetterSpacingValue}; display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
+    #log-text .log-entry { margin-bottom:1em; }
+    .spacing-neutral-punctuation { letter-spacing:normal; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  </style>
+</head>
+<body>
+  <div id="viewer-layout">
+  <div id="viewer-screen" class="${theme === 'light' ? 'is-light' : ''}">
+    <div id="standing-container" class="${standingShadowValue ? 'has-shadow' : ''}">
+      <img id="character-img-1" class="standing-character" src="" alt="">
+      <img id="character-img-2" class="standing-character" src="" alt="">
+      <img id="character-img-3" class="standing-character" src="" alt="">
+      <img id="character-img-4" class="standing-character" src="" alt="">
+    </div>
+    <div id="dialogue-box">
+      <div id="dialogue-content">
+        <div id="speaker-name" style="color: #fff;">System</div>
+        <div id="dialogue-text">화면을 클릭하면 재생을 시작합니다.</div>
+      </div>
+      <div id="next-arrow">▼</div>
+    </div>
+    <div id="bottom-ui">
+      <button id="auto-play-btn" title="자동 재생">▶</button>
+      <input type="range" id="progress-slider" min="0" max="0" value="0">
+      <span id="page-indicator">0 / 0</span>
+      <button id="controls-toggle" aria-label="진행도 창 열기" aria-expanded="false">▼</button>
+    </div>
+    <div id="log-view" role="log" aria-label="이전 대화 로그"><div id="log-text"></div></div>
+  </div>
+  ${bgmDataUrl ? '<aside id="replay-bgm" aria-label="배경 음악"><audio id="replay-bgm-audio" loop preload="auto" src="' + bgmDataUrl + '"></audio><div id="replay-bgm-controls"><p id="replay-bgm-heading">BGM</p><button type="button" id="bgm-play-toggle" aria-label="재생" title="재생"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg></button><input id="bgm-volume" type="range" min="0" max="100" value="' + bgmVolumeValue + '" aria-label="음량"></div></aside>' : ''}
+  </div>
+  <script>
+    const canvasWidth = ${canvasWidthValue};
+    const canvasHeight = ${canvasHeightValue};
+    const bgmVolume = ${bgmVolumeValue};
+    const bgmAudio = document.getElementById('replay-bgm-audio');
+    function setReplayBgmToggleIcon(isPlaying) {
+      if (!replayBgmToggle) return;
+      replayBgmToggle.setAttribute('aria-label', isPlaying ? '일시정지' : '재생');
+      replayBgmToggle.title = isPlaying ? '일시정지' : '재생';
+      replayBgmToggle.innerHTML = isPlaying ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg>';
+    }
+    function startReplayBgm() {
+      if (!bgmAudio) return;
+      bgmAudio.volume = bgmVolume / 100;
+      bgmAudio.play().catch(() => { const status=document.getElementById('bgm-status'); if(status) status.textContent='재생을 시작할 수 없습니다. 재생 버튼을 눌러 주세요.'; });
+    }
+    if (bgmAudio) bgmAudio.volume = bgmVolume / 100;
+    function scaleScreen() {
+      const screen = document.getElementById('viewer-screen');
+      const layout = document.getElementById('viewer-layout');
+      const bgmPanel = document.getElementById('replay-bgm');
+      const extraWidth = bgmPanel ? 222 : 0;
+      const scale = Math.max(.1, Math.min(1, (window.innerWidth - extraWidth) / canvasWidth, window.innerHeight / canvasHeight));
+      const scaledWidth = canvasWidth * scale;
+      const scaledHeight = canvasHeight * scale;
+      const layoutHeight = scaledHeight;
+      layout.style.width = \`\${scaledWidth + extraWidth}px\`;
+      layout.style.height = \`\${layoutHeight}px\`;
+      screen.style.left = '0';
+      screen.style.top = \`\${(layoutHeight - scaledHeight) / 2}px\`;
+      screen.style.transform = \`scale(\${scale})\`;
+      if (bgmPanel) { bgmPanel.style.left = \`\${scaledWidth + 12}px\`; bgmPanel.style.top = \`\${Math.max(8, (layoutHeight - 90) / 2)}px\`; }
+    }
+    window.addEventListener('resize', scaleScreen);
+    scaleScreen();
+    const replayBgmToggle = document.getElementById('bgm-play-toggle');
+    if (replayBgmToggle) replayBgmToggle.addEventListener('click', e => {
+      e.stopPropagation();
+      if (bgmAudio && !bgmAudio.paused) { bgmAudio.pause(); setReplayBgmToggleIcon(false); }
+      else startReplayBgm();
+    });
+    if (bgmAudio) {
+      bgmAudio.addEventListener('play', () => setReplayBgmToggleIcon(true));
+      bgmAudio.addEventListener('pause', () => setReplayBgmToggleIcon(false));
+      bgmAudio.addEventListener('error', () => { const status=document.getElementById('bgm-status'); if(status) status.textContent='이 오디오 파일은 브라우저에서 재생할 수 없습니다.'; });
+    }
+    const replayBgmVolume = document.getElementById('bgm-volume');
+    if (replayBgmVolume) replayBgmVolume.addEventListener('input', e => {
+      const value=Number(e.target.value);
+      if (bgmAudio) bgmAudio.volume = value / 100;
+    });
+    document.addEventListener('wheel', event => {
+      if (!(event.target instanceof Element)) return;
+      const slider = event.target.closest('input[type="range"]');
+      if (!slider || slider.disabled) return;
+      event.preventDefault();
+      const min=slider.min===''?0:Number(slider.min), max=slider.max===''?100:Number(slider.max);
+      const rawStep=slider.step===''||slider.step==='any'?1:Number(slider.step), step=Number.isFinite(rawStep)&&rawStep>0?rawStep:1;
+      const direction=event.deltaY<0?1:event.deltaY>0?-1:0;
+      if (!direction) return;
+      const next=Math.min(max,Math.max(min,Number(slider.value)+direction*step));
+      if (next===Number(slider.value)) return;
+      slider.value=String(next); slider.dispatchEvent(new Event('input',{bubbles:true}));
+    }, { passive:false });
+
+    const storyData = ${storyJson};
+    function preloadReplayFonts() {
+      if (!document.fonts || !storyData.length) return;
+      const glyphs = [...new Set(storyData.map(scene => String(scene.name || '') + String(scene.text || '')).join(''))].join('');
+      Promise.all([
+        document.fonts.load('400 20px "Pretendard"', glyphs),
+        document.fonts.load('800 20px "Pretendard"', glyphs),
+        document.fonts.load('400 20px "BookkMyungjo"', glyphs),
+        document.fonts.load('800 20px "BookkMyungjo"', glyphs)
+      ]).catch(() => {});
+    }
+    preloadReplayFonts();
+    const imageMap = ${imageMapJson}; // 용량 최적화: 이미지 사전 불러오기
+    const sceneBackgrounds = ${sceneBackgroundsJson};
+    const narrationNames = ${narrationNamesJson};
+    const baseBackground = '${bgBase64}';
+    const baseBackgroundSettings = ${baseBackgroundSettingsJson};
+    const characterStandingSettings = ${characterStandingSettingsJson};
+    const characterPositionSettings = ${characterPositionSettingsJson};
+    const standingDivision = ${standingDivision};
+    const standingGap = ${standingGapValue};
+    const standingPositionLock = ${standingPositionLock};
+    const standingDefaults = { x: 0, y: 0, size: 100 };
+    let currentIndex = -1;
+    let isTyping = false;
+    let currentText = "";
+    let typeInterval;
+    let autoPlayTimeout;
+    let isAutoPlaying = false;
+
+    function getCharacterStandingSettings(name) { return characterStandingSettings[name] || standingDefaults; }
+    function getBackgroundScale(settings) {
+      if (!settings.width || !settings.height) return 1;
+      const coverScale = Math.max(canvasWidth / settings.width, canvasHeight / settings.height);
+      return coverScale * (1 + Number(settings.zoom || 0) / 100);
+    }
+    function fittedBackgroundSize(settings) {
+      if (!settings.width || !settings.height) return 'cover';
+      const scale = getBackgroundScale(settings);
+      return \`\${Math.round(settings.width * scale)}px \${Math.round(settings.height * scale)}px\`;
+    }
+    function getBackgroundPosition(settings) {
+      const scale = getBackgroundScale(settings);
+      const scaledWidth = settings.width ? settings.width * scale : canvasWidth;
+      const scaledHeight = settings.width && settings.height ? settings.height * scale : canvasHeight;
+      const centeredX = (canvasWidth - scaledWidth) / 2;
+      const centeredY = (canvasHeight - scaledHeight) / 2;
+      const panX = (Number(settings.x ?? 50) - 50) * canvasWidth / 100;
+      const panY = (Number(settings.y ?? 50) - 50) * canvasHeight / 100;
+      return \`\${centeredX + panX}px \${centeredY + panY}px\`;
+    }
+    function getStandingSlots(index) {
+      const figures = Array(standingDivision).fill(null);
+      let nextArrivalOrder = 0;
+      let lastSpeaker = '';
+      let previousSpeaker = '';
+      const reservedSlots = Array(standingDivision).fill('');
+      if (standingPositionLock) Object.entries(characterPositionSettings).forEach(([position, character]) => { const slot = Number(position) - 1; if (slot >= 0 && slot < standingDivision) reservedSlots[slot] = character; });
+      const slotAllowed = (slot, name) => !standingPositionLock || !reservedSlots[slot] || reservedSlots[slot] === name;
+      for (let i = 0; i <= index; i++) {
+        const scene = storyData[i];
+        const name = String(scene && scene.name || '').trim();
+        const image = scene && scene.imageId ? imageMap[scene.imageId] : null;
+        if (narrationNames.includes(name)) { figures.fill(null); lastSpeaker = ''; previousSpeaker = ''; continue; }
+        if (!name || name === '-' || !image) continue;
+        const replacementSpeaker = previousSpeaker;
+        if (lastSpeaker && lastSpeaker !== name) figures.forEach(figure => { if (figure) figure.dimmed = true; });
+        const existingIndex = figures.findIndex(figure => figure && figure.name === name);
+        const assignedPosition = standingPositionLock ? Number(Object.keys(characterPositionSettings).find(position => characterPositionSettings[position] === name)) : 0;
+        if (standingPositionLock && assignedPosition > standingDivision) { if (lastSpeaker && lastSpeaker !== name) previousSpeaker = lastSpeaker; lastSpeaker = name; continue; }
+        const fixedPosition = assignedPosition;
+        let target = fixedPosition >= 1 && fixedPosition <= standingDivision ? fixedPosition - 1 : (existingIndex >= 0 && slotAllowed(existingIndex, name) ? existingIndex : -1);
+        if (target < 0) {
+          target = figures.findIndex((figure, slot) => !figure && slotAllowed(slot, name));
+          if (target < 0) {
+            if (standingDivision === 2) {
+              const previousSlot = figures.findIndex(figure => figure && figure.name === replacementSpeaker);
+              if (previousSlot >= 0 && slotAllowed(previousSlot, name)) target = previousSlot;
+            }
+            if (target < 0) {
+              const candidates = figures.map((figure, slot) => ({ figure, slot })).filter(entry => entry.figure && slotAllowed(entry.slot, name));
+              if (candidates.length) target = candidates.reduce((oldest, entry) => entry.figure.arrivalOrder < oldest.figure.arrivalOrder ? entry : oldest).slot;
+            }
+          }
+        }
+        if (target < 0) { if (lastSpeaker && lastSpeaker !== name) previousSpeaker = lastSpeaker; lastSpeaker = name; continue; }
+        if (existingIndex >= 0 && existingIndex !== target) figures[existingIndex] = null;
+        if (figures[target] && figures[target].name === name) { figures[target].image = image; figures[target].dimmed = false; }
+        else figures[target] = { name, image, dimmed: false, arrivalOrder: nextArrivalOrder++ };
+        if (lastSpeaker && lastSpeaker !== name) previousSpeaker = lastSpeaker;
+        lastSpeaker = name;
+      }
+      return figures;
+    }
+    function setStandingDimState(img, figure) {
+      img.dataset.characterName = figure.name;
+      img.classList.toggle('is-dimmed', Boolean(figure.dimmed));
+    }
+    function appendDialogueText(container, text) {
+      const punctuationPattern = /[.．…‥⋯·・･]+/gu;
+      let cursor = 0;
+      let match;
+      while ((match = punctuationPattern.exec(String(text || '')))) {
+        if (match.index > cursor) container.appendChild(document.createTextNode(String(text).slice(cursor, match.index)));
+        const punctuation = document.createElement('span');
+        punctuation.className = 'spacing-neutral-punctuation';
+        punctuation.textContent = match[0];
+        container.appendChild(punctuation);
+        cursor = punctuationPattern.lastIndex;
+      }
+      if (cursor < String(text || '').length) container.appendChild(document.createTextNode(String(text || '').slice(cursor)));
+    }
+    function appendTypedDialogueCharacter(container, character, state) {
+      if (/[.．…‥⋯·・･]/u.test(character)) {
+        if (!state.punctuationSpan) {
+          state.punctuationSpan = document.createElement('span');
+          state.punctuationSpan.className = 'spacing-neutral-punctuation';
+          container.appendChild(state.punctuationSpan);
+        }
+        state.punctuationSpan.appendChild(document.createTextNode(character));
+      } else {
+        state.punctuationSpan = null;
+        container.appendChild(document.createTextNode(character));
+      }
+    }
+    function renderStandingPair(index) {
+      const figures = getStandingSlots(index);
+      [1, 2, 3, 4].forEach(slot => {
+        const img = document.getElementById('character-img-' + slot); const figure = figures[slot - 1];
+        if (slot > standingDivision || !figure) { img.style.display='none'; img.classList.remove('is-dimmed'); delete img.dataset.characterName; return; }
+        const segmentWidth = canvasWidth / standingDivision;
+        const baseCenter = (slot - 0.5) * segmentWidth;
+        const standing = getCharacterStandingSettings(figure.name);
+        img.style.left = (canvasWidth / 2 + (baseCenter - canvasWidth / 2) * (1 + standingGap / 100) + Number(standing.x || 0)) + 'px';
+        img.style.transform = 'translateX(-50%)';
+        img.style.bottom = \`\${standing.y}px\`;
+        img.style.height = \`\${850 * standing.size / 100}px\`;
+        if (img.src !== figure.image) img.src = figure.image;
+        setStandingDimState(img, figure); img.style.display='block';
+      });
+    }
+
+    document.getElementById('progress-slider').max = storyData.length - 1;
+
+    function renderScene(index) {
+      if (index >= storyData.length) {
+        if (isAutoPlaying) toggleAutoPlay();
+        return;
+      }
+      
+      clearTimeout(autoPlayTimeout);
+      document.getElementById('viewer-screen').classList.add('has-started');
+      document.getElementById('page-indicator').textContent = (index + 1) + " / " + storyData.length;
+      document.getElementById('progress-slider').value = index;
+
+      const scene = storyData[index];
+      const activeBackground = [...sceneBackgrounds].reverse().find(item => item.image && index >= item.start && index <= item.end);
+      const bgSettings = activeBackground || baseBackgroundSettings;
+      const screen = document.getElementById('viewer-screen');
+      screen.style.backgroundImage = activeBackground ? \`url('\${activeBackground.image}')\` : (baseBackground ? \`url('\${baseBackground}')\` : '');
+      screen.style.backgroundPosition = getBackgroundPosition(bgSettings);
+      screen.style.backgroundRepeat = 'no-repeat';
+      screen.style.backgroundSize = fittedBackgroundSize(bgSettings);
+      const nameBox = document.getElementById('speaker-name');
+      nameBox.textContent = scene.name;
+      nameBox.style.color = scene.color;
+      nameBox.style.visibility = narrationNames.includes(scene.name) ? 'hidden' : 'visible';
+
+      renderStandingPair(index);
+
+      const textBox = document.getElementById('dialogue-text');
+      currentText = scene.text;
+      textBox.textContent = "";
+      isTyping = true;
+      let charIndex = 0;
+      const typingState = { punctuationSpan: null };
+      clearInterval(typeInterval);
+      typeInterval = setInterval(() => {
+        appendTypedDialogueCharacter(textBox, currentText.charAt(charIndex), typingState);
+        charIndex++;
+        textBox.scrollTop = textBox.scrollHeight; 
+        if (charIndex >= currentText.length) { 
+            clearInterval(typeInterval); 
+            isTyping = false; 
+            if (isAutoPlaying) {
+                 autoPlayTimeout = setTimeout(() => {
+                     currentIndex++;
+                     renderScene(currentIndex);
+                 }, 1500);
+            }
+        }
+      }, 20);
+    }
+
+    function toggleAutoPlay() {
+        isAutoPlaying = !isAutoPlaying;
+        const btn = document.getElementById('auto-play-btn');
+        btn.classList.toggle('is-playing', isAutoPlaying);
+        btn.setAttribute('aria-label', isAutoPlaying ? '자동 재생 중지' : '자동 재생');
+        btn.style.backgroundColor = 'transparent';
+
+        if (isAutoPlaying) {
+            if (currentIndex === -1) {
+                currentIndex = 0;
+                renderScene(currentIndex);
+            } else if (!isTyping && currentIndex < storyData.length) {
+                clearTimeout(autoPlayTimeout);
+                autoPlayTimeout = setTimeout(() => {
+                    currentIndex++;
+                    renderScene(currentIndex);
+                }, 1500);
+            }
+        } else {
+            clearTimeout(autoPlayTimeout);
+        }
+    }
+
+    document.getElementById('auto-play-btn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (bgmAudio && bgmAudio.paused) startReplayBgm();
+        toggleAutoPlay();
+    });
+
+    document.getElementById('progress-slider').addEventListener('input', function(e) {
+      if (currentIndex === -1) return;
+      currentIndex = parseInt(e.target.value);
+      clearInterval(typeInterval);
+      clearTimeout(autoPlayTimeout);
+      isTyping = false;
+      renderScene(currentIndex);
+    });
+
+    document.getElementById('bottom-ui').addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+
+    function openLogView() {
+      if (currentIndex < 0) return;
+      const logText = document.getElementById('log-text'); logText.replaceChildren();
+      storyData.slice(0, currentIndex + 1).forEach(scene => {
+        const entry = document.createElement('div'); entry.className = 'log-entry';
+        if (scene.name && scene.name !== '-' && !narrationNames.includes(scene.name)) {
+          const speaker = document.createElement('span'); speaker.textContent = scene.text ? scene.name + ': ' : scene.name; speaker.style.color = scene.color; entry.appendChild(speaker);
+        }
+        if (scene.text) entry.appendChild(document.createTextNode(String(scene.text)));
+        logText.appendChild(entry);
+      });
+      if (isAutoPlaying) toggleAutoPlay();
+      const view = document.getElementById('log-view'); document.getElementById('viewer-screen').classList.add('is-log-view'); view.style.display = 'block'; view.scrollTop = view.scrollHeight;
+    }
+    function closeLogView() {
+      document.getElementById('log-view').style.display = 'none';
+      const box = document.getElementById('dialogue-box'); box.style.transition = 'none'; document.getElementById('viewer-screen').classList.remove('is-log-view'); box.offsetWidth; box.style.transition = '';
+    }
+    document.getElementById('controls-toggle').addEventListener('click', function(e) {
+      e.stopPropagation(); const panel = document.getElementById('bottom-ui'); const isOpen = panel.classList.toggle('is-open');
+      this.textContent = isOpen ? '▲' : '▼'; this.setAttribute('aria-expanded', String(isOpen)); this.setAttribute('aria-label', isOpen ? '진행도 창 닫기' : '진행도 창 열기');
+    });
+    document.getElementById('log-view').addEventListener('click', e => { e.stopPropagation(); closeLogView(); });
+    document.getElementById('log-view').addEventListener('wheel', function(e) {
+      e.stopPropagation(); if (e.deltaY > 0 && this.scrollTop + this.clientHeight >= this.scrollHeight - 2) { e.preventDefault(); closeLogView(); }
+    }, { passive:false });
+
+    document.getElementById('viewer-screen').addEventListener('click', function() {
+      if (bgmAudio && bgmAudio.paused) startReplayBgm();
+      if (currentIndex === -1) { currentIndex = 0; renderScene(currentIndex); return; }
+      if (isTyping) {
+        clearInterval(typeInterval); 
+        const dialogueTextBox = document.getElementById('dialogue-text');
+        dialogueTextBox.replaceChildren();
+        appendDialogueText(dialogueTextBox, currentText); 
+        document.getElementById('dialogue-text').scrollTop = 0;
+        isTyping = false;
+        if (isAutoPlaying) {
+             clearTimeout(autoPlayTimeout);
+             autoPlayTimeout = setTimeout(() => {
+                 currentIndex++;
+                 renderScene(currentIndex);
+             }, 1500);
+        }
+      } else {
+        clearTimeout(autoPlayTimeout);
+        currentIndex++; 
+        renderScene(currentIndex);
+      }
+    });
+    document.getElementById('viewer-screen').addEventListener('wheel', function(e) {
+      if (e.target.closest && e.target.closest('#bottom-ui')) return;
+      e.preventDefault(); if (e.deltaY < 0) openLogView(); else if (e.deltaY > 0) document.getElementById('viewer-screen').click();
+    }, { passive:false });
+    document.addEventListener('keydown', function(e) {
+      if (document.getElementById('log-view').style.display === 'block') { if (e.key === 'Escape') closeLogView(); return; }
+      if (e.target.closest && e.target.closest('#bottom-ui')) return;
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); document.getElementById('viewer-screen').click(); }
+    });
+  <\/script>
+</body>
+</html>`;
+
+      const blob = new Blob([finalHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'trpg_visual_novel_HQ.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
