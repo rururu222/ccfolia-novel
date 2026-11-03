@@ -463,6 +463,8 @@
     #title-card.is-gothic { font-family:'Pretendard', sans-serif; }
     #log-view { font-family:var(--dialogue-font-family, 'Noto Sans KR', sans-serif); letter-spacing:var(--dialogue-letter-spacing, normal); display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
     #log-text .log-entry { margin-bottom:1em; }
+    #log-view { scrollbar-width:none; -ms-overflow-style:none; }
+    #log-view::-webkit-scrollbar { display:none; }
     .spacing-neutral-punctuation { letter-spacing:normal; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   </style>
@@ -1503,6 +1505,9 @@
       this.textContent = isOpen ? '▲' : '▼'; this.setAttribute('aria-expanded', String(isOpen)); this.setAttribute('aria-label', isOpen ? '진행도 창 닫기' : '진행도 창 열기');
     });
     document.getElementById('log-view').addEventListener('click', e => { e.stopPropagation(); closeLogView(); });
+    document.getElementById('log-view').addEventListener('wheel', function(e) {
+      e.stopPropagation(); if (e.deltaY > 0 && this.scrollTop + this.clientHeight >= this.scrollHeight - 2) { e.preventDefault(); closeLogView(); }
+    }, { passive:false });
     document.getElementById('preview-screen').addEventListener('wheel', function(e) {
       if (e.target.closest && e.target.closest('#bottom-ui')) return;
       e.preventDefault(); if (e.deltaY < 0) openLogView(); else if (e.deltaY > 0) { closeLogView(); document.getElementById('preview-screen').click(); }
@@ -1743,6 +1748,8 @@
     #title-card.is-gothic { font-family:'Pretendard', sans-serif; }
     #log-view { font-family: ${dialogueFontFamilyValue}; letter-spacing: ${dialogueLetterSpacingValue}; display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
     #log-text .log-entry { margin-bottom:1em; }
+    #log-view { scrollbar-width:none; -ms-overflow-style:none; }
+    #log-view::-webkit-scrollbar { display:none; }
     .spacing-neutral-punctuation { letter-spacing:normal; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   </style>
