@@ -325,7 +325,7 @@
     .range-value { display:inline-block; flex:0 0 52px; width:52px; min-width:0; box-sizing:border-box; overflow:visible; text-align:right; white-space:nowrap; color:var(--text-muted); font-size:11px; font-variant-numeric:tabular-nums; }
     .standing-global-controls { display:flex; flex-direction:column; gap:0; min-width:0; }
     .standing-global-controls > .bg-control-heading { margin-bottom:4px; }
-    .standing-character-controls { margin-top:8px; }
+    .standing-subsection { margin-top:8px; }
     .standing-global-controls > select { width:100%; min-width:0; box-sizing:border-box; margin-bottom:4px; }
     .standing-lock-row { cursor:pointer; }
     .bg-base-location-inputs > label + label, .bg-range-location-inputs > label + label, .standing-xy-inputs > label + label { margin-left:10px; }
@@ -513,7 +513,8 @@
 
         <section class="settings-group">
         <div class="sidebar-title">스탠딩 설정</div>
-        <div class="standing-global-controls">
+        <label class="standing-lock-row plain"><span>스탠딩 그림자</span><input id="standing-shadow" type="checkbox" checked></label>
+        <div class="standing-global-controls standing-subsection">
           <div class="bg-control-heading"><span>전체 조정</span></div>
           <div class="standing-xy-inputs">
             <label class="standing-mini-control"><span>X</span><input id="standing-x" type="range" min="-300" max="300" step="5" value="0"><small class="range-value" id="standing-x-value">0 px</small></label>
@@ -526,8 +527,7 @@
           </div>
           <div class="standing-gap-control"><div class="standing-gap-row"><label class="standing-gap-slider"><span>간격</span><input id="standing-gap" type="range" min="-50" max="50" step="1" value="0"><small class="range-value" id="standing-gap-value">0%</small></label><button type="button" id="standing-gap-reset" class="bg-reset-icon" aria-label="간격 초기화" title="간격 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div></div>
         </div>
-        <label class="standing-lock-row plain"><span>스탠딩 그림자</span><input id="standing-shadow" type="checkbox" checked></label>
-        <div class="standing-global-controls standing-character-controls">
+        <div class="standing-global-controls standing-subsection">
           <div class="bg-control-heading"><span>캐릭터별 조정</span><button type="button" id="character-standing-reset" class="bg-reset-icon" aria-label="선택한 캐릭터 조정 초기화" title="선택한 캐릭터 조정 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div>
           <select id="standing-character-select" aria-label="조정할 캐릭터"></select>
           <div class="standing-xy-inputs">
