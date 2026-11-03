@@ -1655,7 +1655,16 @@
       bgmAudio.volume = bgmVolume / 100;
       bgmAudio.play().catch(() => { const status=document.getElementById('bgm-status'); if(status) status.textContent='재생을 시작할 수 없습니다. 재생 버튼을 눌러 주세요.'; });
     }
-    if (bgmAudio) bgmAudio.volume = bgmVolume / 100;
+    if (bgmAudio) {
+      bgmAudio.volume = bgmVolume / 100;
+      fetch(bgmAudio.src).then(function(res) { return res.blob(); }).then(function(blob) {
+        if (!bgmAudio.paused) return;
+        bgmAudio.src = URL.createObjectURL(blob);
+        bgmAudio.load();
+      }).catch(function() {});
+      bgmAudio.play().catch(function() {});
+      document.addEventListener('pointerdown', function() { if (bgmAudio.paused) startReplayBgm(); }, { once: true });
+    }
     function scaleScreen() {
       const screen = document.getElementById('viewer-screen');
       const layout = document.getElementById('viewer-layout');
@@ -1850,6 +1859,16 @@
 
     document.getElementById('progress-slider').max = storyData.length - 1;
 
+    function applySceneBackground(index) {
+      const activeBackground = [...sceneBackgrounds].reverse().find(item => item.image && index >= item.start && index <= item.end);
+      const bgSettings = activeBackground || baseBackgroundSettings;
+      const screen = document.getElementById('viewer-screen');
+      screen.style.backgroundImage = activeBackground ? \`url('\${activeBackground.image}')\` : (baseBackground ? \`url('\${baseBackground}')\` : '');
+      screen.style.backgroundPosition = getBackgroundPosition(bgSettings);
+      screen.style.backgroundRepeat = 'no-repeat';
+      screen.style.backgroundSize = fittedBackgroundSize(bgSettings);
+    }
+
     function renderScene(index) {
       if (index >= storyData.length) {
         if (isAutoPlaying) toggleAutoPlay();
@@ -1862,13 +1881,7 @@
       document.getElementById('progress-slider').value = index;
 
       const scene = storyData[index];
-      const activeBackground = [...sceneBackgrounds].reverse().find(item => item.image && index >= item.start && index <= item.end);
-      const bgSettings = activeBackground || baseBackgroundSettings;
-      const screen = document.getElementById('viewer-screen');
-      screen.style.backgroundImage = activeBackground ? \`url('\${activeBackground.image}')\` : (baseBackground ? \`url('\${baseBackground}')\` : '');
-      screen.style.backgroundPosition = getBackgroundPosition(bgSettings);
-      screen.style.backgroundRepeat = 'no-repeat';
-      screen.style.backgroundSize = fittedBackgroundSize(bgSettings);
+      applySceneBackground(index);
       const nameBox = document.getElementById('speaker-name');
       nameBox.textContent = scene.name;
       nameBox.style.color = scene.color;
@@ -2019,6 +2032,7 @@
       if (titleSettings.mode === 'image') { card.classList.add('is-image-mode'); const titleImage = document.getElementById('title-image'); if (titleSettings.image) titleImage.src = titleSettings.image; titleImage.style.transform = 'translate(' + (titleSettings.imageX - 50) + '%, ' + (titleSettings.imageY - 50) + '%) scale(' + (1 + titleSettings.imageZoom / 100) + ')'; }
       card.classList.add('is-visible');
       document.getElementById('viewer-screen').classList.add('is-title-showing');
+      applySceneBackground(0);
     } else if (storyData.length) { currentIndex = 0; renderScene(currentIndex); }
   <\/script>
 </body>
