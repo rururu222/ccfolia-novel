@@ -149,6 +149,8 @@
     #character-position-controls { display:flex; flex-direction:column; gap:8px; }
     #title-settings-controls { display:none; flex-direction:column; gap:8px; min-width:0; }
     #title-settings-controls.is-open { display:flex; }
+    #title-text-fields { display:flex; flex-direction:column; gap:8px; min-width:0; }
+    #title-settings-controls[data-mode="text"] #title-image-field, #title-settings-controls[data-mode="image"] #title-text-fields { display:none; }
     .title-field { display:flex; flex-direction:column; gap:4px; min-width:0; }
     .title-field input[type="text"], .title-field textarea { width:100%; min-width:0; box-sizing:border-box; padding:6px 8px; border:1px solid var(--border); border-radius:6px; color:var(--text-main); background:var(--bg-main); font-size:12px; font-family:inherit; resize:vertical; }
     .title-field input[type="text"]:focus, .title-field textarea:focus { outline:none; border-color:var(--accent); }
@@ -426,6 +428,10 @@
     #title-main { width:80%; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
     #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
     #title-card [data-empty="true"] { display:none; }
+    #title-text { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; margin-top:80px; }
+    #title-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:none; }
+    #title-card.is-image-mode #title-image { display:block; }
+    #title-card.is-image-mode #title-text { display:none; }
     #log-view { font-family:var(--dialogue-font-family, 'Noto Sans KR', sans-serif); letter-spacing:var(--dialogue-letter-spacing, normal); display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
     #log-text .log-entry { margin-bottom:1em; }
     .spacing-neutral-punctuation { letter-spacing:normal; }
@@ -499,11 +505,19 @@
         <section class="settings-group">
           <div class="sidebar-title">타이틀 화면</div>
           <label class="standing-lock-row plain"><span>타이틀 화면 사용</span><input id="title-enabled" type="checkbox"></label>
-          <div id="title-settings-controls">
+          <div id="title-settings-controls" data-mode="text">
+            <label class="setting-row"><span class="setting-label">모드</span><select id="title-mode"><option value="text">텍스트</option><option value="image">이미지</option></select></label>
+            <div id="title-text-fields">
             <label class="title-field"><span class="setting-label">룰 (상단)</span><input id="title-rule-input" type="text" placeholder="예: inSANe"></label>
             <label class="title-field"><span class="setting-label">제목 (가운데)</span><textarea id="title-main-input" rows="2" placeholder="시나리오 제목"></textarea></label>
             <label class="standing-mini-control title-spacing-control"><span>자간</span><input id="title-spacing" type="range" min="-0.1" max="0.5" step="0.01" value="0"></label>
             <label class="title-field"><span class="setting-label">하단 문구</span><textarea id="title-credit-input" rows="2" placeholder="예: written by ..."></textarea></label>
+            </div>
+            <label id="title-image-field" class="bgm-file-row" title="타이틀 이미지 업로드" aria-label="타이틀 이미지 업로드">
+              <span class="bgm-upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg></span>
+              <span id="title-image-name" class="bgm-file-name">선택된 파일 없음</span>
+              <input type="file" id="title-image-upload" accept="image/*">
+            </label>
           </div>
         </section>
         <section class="settings-group">
@@ -598,7 +612,7 @@
             <span id="page-indicator">0 / 0</span>
             <button id="controls-toggle" aria-label="진행도 창 열기" aria-expanded="false">▼</button>
           </div>
-          <div id="title-card" aria-label="타이틀 화면"><div id="title-rule" data-empty="true"></div><div id="title-main" data-empty="true"></div><div id="title-credit" data-empty="true"></div></div>
+          <div id="title-card" aria-label="타이틀 화면"><img id="title-image" alt=""><div id="title-text"><div id="title-rule" data-empty="true"></div><div id="title-main" data-empty="true"></div><div id="title-credit" data-empty="true"></div></div></div>
           <div id="log-view" role="log" aria-label="이전 대화 로그"><div id="log-text"></div></div>
         </div>
       </div>
@@ -612,13 +626,17 @@
     const baseBackgroundSettings = { x: 50, y: 50, zoom: 0 };
     let highResImageMap = {}; 
     let currentIndex = 0;
-    const titleSettings = { enabled: false, rule: '', title: '', credit: '', spacing: 0 };
+    const titleSettings = { enabled: false, mode: 'text', image: '', rule: '', title: '', credit: '', spacing: 0 };
     let titleHideTimer = null;
     function applyTitleText(root, settings) {
       [['title-rule', settings.rule], ['title-main', settings.title], ['title-credit', settings.credit]].forEach(([id, text]) => {
         const el = root.querySelector('#' + id); el.textContent = text; el.dataset.empty = String(!String(text).trim());
       });
       root.querySelector('#title-main').style.letterSpacing = settings.spacing + 'em';
+      const isImage = settings.mode === 'image';
+      root.classList.toggle('is-image-mode', isImage);
+      const image = root.querySelector('#title-image');
+      if (isImage && settings.image) image.src = settings.image; else image.removeAttribute('src');
     }
     function showPreviewTitle() {
       const card = document.getElementById('title-card');
@@ -1399,6 +1417,21 @@
     [['title-rule-input', 'rule'], ['title-main-input', 'title'], ['title-credit-input', 'credit']].forEach(([id, key]) => {
       document.getElementById(id).addEventListener('input', e => { titleSettings[key] = e.target.value; showPreviewTitle(); });
     });
+    document.getElementById('title-mode').addEventListener('change', e => {
+      titleSettings.mode = e.target.value;
+      document.getElementById('title-settings-controls').dataset.mode = titleSettings.mode;
+      showPreviewTitle();
+    });
+    document.getElementById('title-image-upload').addEventListener('change', e => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        titleSettings.image = String(reader.result || '');
+        document.getElementById('title-image-name').textContent = file.name;
+        showPreviewTitle();
+      };
+      reader.readAsDataURL(file);
+    });
     document.getElementById('title-spacing').addEventListener('input', e => {
       titleSettings.spacing = Number(e.target.value);
       showPreviewTitle();
@@ -1441,7 +1474,7 @@
       const characterStandingSettingsJson = JSON.stringify(characterStandingSettings);
       const characterPositionSettingsJson = JSON.stringify(characterPositionSettings);
       const standingGapValue = standingGap;
-      const titleSettingsJson = JSON.stringify(titleSettings).replace(/</g, '\\u003c');
+      const titleSettingsJson = JSON.stringify(Object.assign({}, titleSettings, { image: titleSettings.mode === 'image' ? titleSettings.image : '' })).replace(/</g, '\\u003c');
       const standingShadowValue = standingShadow;
       const standingXValue = standingX;
       const dialogueFontFamilyValue = dialogueFont === 'myeongjo' ? "'BookkMyungjo', serif" : "'Pretendard', sans-serif";
@@ -1537,6 +1570,10 @@
     #title-main { width:80%; font-size:70px; line-height:1.25; white-space:pre-wrap; word-break:keep-all; }
     #title-credit { margin-top:26px; font-size:20px; letter-spacing:.04em; white-space:pre-wrap; }
     #title-card [data-empty="true"] { display:none; }
+    #title-text { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; margin-top:80px; }
+    #title-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:none; }
+    #title-card.is-image-mode #title-image { display:block; }
+    #title-card.is-image-mode #title-text { display:none; }
     #log-view { font-family: ${dialogueFontFamilyValue}; letter-spacing: ${dialogueLetterSpacingValue}; display:none; position:absolute; inset:0; z-index:100; box-sizing:border-box; overflow-y:auto; padding:40px 60px; background:rgba(0,0,0,.78); color:#fff; font-size:22px; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
     #log-text .log-entry { margin-bottom:1em; }
     .spacing-neutral-punctuation { letter-spacing:normal; }
@@ -1565,7 +1602,7 @@
       <span id="page-indicator">0 / 0</span>
       <button id="controls-toggle" aria-label="진행도 창 열기" aria-expanded="false">▼</button>
     </div>
-    <div id="title-card" aria-label="타이틀 화면"><div id="title-rule" data-empty="true"></div><div id="title-main" data-empty="true"></div><div id="title-credit" data-empty="true"></div></div>
+    <div id="title-card" aria-label="타이틀 화면"><img id="title-image" alt=""><div id="title-text"><div id="title-rule" data-empty="true"></div><div id="title-main" data-empty="true"></div><div id="title-credit" data-empty="true"></div></div></div>
     <div id="log-view" role="log" aria-label="이전 대화 로그"><div id="log-text"></div></div>
   </div>
   ${bgmDataUrl ? '<audio id="replay-bgm-audio" loop preload="auto" src="' + bgmDataUrl + '"></audio>' : ''}
@@ -1947,6 +1984,7 @@
         const el = document.getElementById(pair[0]); el.textContent = pair[1]; el.dataset.empty = String(!String(pair[1]).trim());
       });
       document.getElementById('title-main').style.letterSpacing = titleSettings.spacing + 'em';
+      if (titleSettings.mode === 'image') { card.classList.add('is-image-mode'); if (titleSettings.image) document.getElementById('title-image').src = titleSettings.image; }
       card.classList.add('is-visible');
       document.getElementById('viewer-screen').classList.add('is-title-showing');
     } else if (storyData.length) { currentIndex = 0; renderScene(currentIndex); }
