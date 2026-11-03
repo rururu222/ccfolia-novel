@@ -965,8 +965,7 @@
     document.getElementById('add-scene-bg').addEventListener('click', () => {
       const notice = document.getElementById('scene-bg-notice');
       if (!bgBase64) {
-        notice.textContent = '구간별 배경을 추가하려면 기본 배경 이미지를 먼저 업로드하세요.';
-        notice.style.display = 'block';
+        notice.style.display = 'none';
         return;
       }
       if (!storyData.length) {
