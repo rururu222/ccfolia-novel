@@ -528,11 +528,12 @@
           <div class="standing-gap-control"><div class="standing-gap-row"><label class="standing-gap-slider"><span>간격</span><input id="standing-gap" type="range" min="-50" max="50" step="1" value="0"><small class="range-value" id="standing-gap-value">0%</small></label><button type="button" id="standing-gap-reset" class="bg-reset-icon" aria-label="간격 초기화" title="간격 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div></div>
         </div>
         <div class="standing-global-controls standing-subsection">
-          <div class="bg-control-heading"><span>캐릭터별 조정</span><button type="button" id="character-standing-reset" class="bg-reset-icon" aria-label="선택한 캐릭터 조정 초기화" title="선택한 캐릭터 조정 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button></div>
+          <div class="bg-control-heading"><span>캐릭터별 조정</span></div>
           <select id="standing-character-select" aria-label="조정할 캐릭터"></select>
           <div class="standing-xy-inputs">
             <label class="standing-mini-control"><span>X</span><input id="character-standing-x" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-x-value">0 px</small></label>
             <label class="standing-mini-control"><span>Y</span><input id="character-standing-y" type="range" min="-100" max="100" step="5" value="0"><small class="range-value" id="character-standing-y-value">0 px</small></label>
+            <button type="button" id="character-standing-reset" class="bg-reset-icon" aria-label="선택한 캐릭터 조정 초기화" title="선택한 캐릭터 조정 초기화"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
           </div>
           <div class="standing-size-row">
             <label class="standing-mini-control"><span>S</span><input id="character-standing-size" type="range" min="50" max="150" step="5" value="100"><small class="range-value" id="character-standing-size-value">100%</small></label>
@@ -1421,10 +1422,12 @@
     #auto-play-btn.is-playing::before { width:10px; height:10px; transform:translate(-50%,-50%); border:0; background:#fff; }
     #auto-play-btn:hover { opacity:.75; }
     #progress-slider { flex:1; cursor:pointer; accent-color:#fff; background:transparent; height:20px; appearance:none; -webkit-appearance:none; }
-    #progress-slider::-webkit-slider-runnable-track,#progress-slider::-moz-range-track { height:4px; border-radius:999px; background:rgba(255,255,255,.35); }
+    #progress-slider::-webkit-slider-runnable-track { height:4px; border-radius:999px; background:rgba(255,255,255,.35); }
+    #progress-slider::-moz-range-track { height:4px; border-radius:999px; background:rgba(255,255,255,.35); }
     #progress-slider::-webkit-slider-thumb { width:14px; height:14px; margin-top:-5px; border:0; border-radius:50%; background:#fff; appearance:none; -webkit-appearance:none; }
     #progress-slider::-moz-range-thumb { width:14px; height:14px; border:0; border-radius:50%; background:#fff; }
     
+    #bottom-ui, #bottom-ui button { font-family:'Pretendard','Noto Sans KR',sans-serif; letter-spacing:-0.01em; }
     #page-indicator { font-size: 15px; font-weight: bold; color: #ccc; min-width: 60px; text-align: right; }
     #standing-container { position:absolute; inset:0; pointer-events:none; transform:translate(${standingXValue}px, ${-standingY}px) scale(${standingSize / 100}); transform-origin:bottom center; transition:transform .2s ease; z-index:5; }
     .standing-character { position:absolute; bottom:0; left:50%; height:850px; width:auto; transform:translateX(-50%); transform-origin:bottom center; filter:none; transition:none; z-index:5; display:none; }
@@ -1464,8 +1467,8 @@
     </div>
     <div id="dialogue-box">
       <div id="dialogue-content">
-        <div id="speaker-name" style="color: #fff;">System</div>
-        <div id="dialogue-text">화면을 클릭하면 재생을 시작합니다.</div>
+        <div id="speaker-name" style="color: #fff;"></div>
+        <div id="dialogue-text"></div>
       </div>
       <div id="next-arrow">▼</div>
     </div>
@@ -1477,7 +1480,7 @@
     </div>
     <div id="log-view" role="log" aria-label="이전 대화 로그"><div id="log-text"></div></div>
   </div>
-  ${bgmDataUrl ? '<aside id="replay-bgm" aria-label="배경 음악"><audio id="replay-bgm-audio" loop preload="auto" src="' + bgmDataUrl + '"></audio><div id="replay-bgm-controls"><p id="replay-bgm-heading">BGM</p><button type="button" id="bgm-play-toggle" aria-label="재생" title="재생"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19 12z"/></svg></button><input id="bgm-volume" type="range" min="0" max="100" value="' + bgmVolumeValue + '" aria-label="음량"></div></aside>' : ''}
+  ${bgmDataUrl ? '<audio id="replay-bgm-audio" loop preload="auto" src="' + bgmDataUrl + '"></audio>' : ''}
   </div>
   <script>
     const canvasWidth = ${canvasWidthValue};
